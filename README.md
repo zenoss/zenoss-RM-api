@@ -41,7 +41,7 @@ def getDevices():
 
 if __name__ == '__main__':
     devices = getDevices()
-    print getDevices()
+    print devices
 
 ```
 
