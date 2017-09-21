@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+#####################################################
+# This script is a basic example of how to retrieve #
+# a list of routers and display their methods and   #
+# associated documentation using the Zenoss JSON    #
+# API and the ZenAPIConnector class written by Adam #
+# McCurdy @ Zenoss                                  #
+#####################################################
+
 import sys
 from ZenAPIConnector import ZenAPIConnector
 

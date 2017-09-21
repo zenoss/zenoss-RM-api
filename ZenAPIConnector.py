@@ -6,6 +6,12 @@ from RouterEndpointMap import RouterEndpointMap
 
 
 class ZenAPIConfig():
+    '''
+    This class reads a file called 'creds.cfg' and generates a config that
+    is then used to connect to the Zenoss API. See the sample creds.cfg
+    file in the repo @ https://github.com/amccurdy/zenoss_api for more
+    information.
+    '''
     def __init__(self):
         self.config = RawConfigParser()
         self.config.read('creds.cfg')
@@ -32,6 +38,11 @@ class ZenAPIConfig():
 
 
 class ZenAPIConnector():
+    '''
+    This class is instantiated with a router, method, and a data
+    dictionary. The router endpoint URL is pulled from the
+    RouterEndpointMap class.
+    ''''
     def __init__(self, router, method, data):
         self.config = ZenAPIConfig()
         self.url = self.config.getUrl()
