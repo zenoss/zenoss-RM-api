@@ -3,7 +3,6 @@ import sys
 from ZenAPIConnector import ZenAPIConnector
 
 router = 'IntrospectionRouter'
-router_endpoint = '/zport/dmd/introspection_router'
 
 
 def getAllRouters():
