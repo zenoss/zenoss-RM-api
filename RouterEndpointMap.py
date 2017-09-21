@@ -60,7 +60,6 @@ class RouterEndpointMap():
                     'ZenWebTxRouter': '/zport/dmd/zenwebtx_router',
                     'vSphereRouter': '/zport/dmd/vsphere_router'}
 
-
     def getEndpoint(self, router):
         if router in self.map.keys():
             return self.map.get(router)
