@@ -30,18 +30,11 @@ The `send()` method makes the HTTP request to the API and returns a response obj
 ```
 from ZenAPIConnector import ZenAPIConnector
 router = 'DeviceRouter'
-
-def getDevices():
-    method = 'getDevices'
-    data = {'limit': 200}
-    api = ZenAPIConnector(router, method, data)
-    response = api.send()
-    data = response.json()['result']
-    return data
-
-if __name__ == '__main__':
-    devices = getDevices()
-    print devices
+method = 'getDevices'
+data = {'limit': 200}
+api = ZenAPIConnector(router, method, data)
+response = api.send()
+print response
 
 ```
 
