@@ -2,6 +2,11 @@
 
 
 class RouterEndpointMap():
+    '''
+    This class isn't incredibly pretty but it's basic. It's used to
+    provide the path to the router you need. Feed it a name, get what
+    you need to build your URL for your API request.
+    '''
     def __init__(self):
         self.map = {'AWSRouter': '/zport/dmd/aws_router',
                     'ApplicationRouter': '/zport/dmd/application_router',

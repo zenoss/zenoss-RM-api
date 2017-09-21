@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+#####################################################
+# This script is a basic example of how to create a #
+# list of devices and display device-related info   #
+# using the Zenoss JSON API and the ZenAPIConnector #
+# class written by Adam McCurdy @ Zenoss            #
+#####################################################
+
 import sys
 from ZenAPIConnector import ZenAPIConnector
 
