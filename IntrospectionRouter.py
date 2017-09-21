@@ -9,12 +9,13 @@ router_endpoint = '/zport/dmd/introspection_router'
 def getAllRouters():
     method = 'getAllRouters'
     data = {}
-    api = ZenAPIConnector(router, router_endpoint, method, data)
+    api = ZenAPIConnector(router, method, data)
     response = api.send()
     data = response.json()['result']['data']
     routers = {}
     for r in data:
         routers[r['action']] = r['urlpath']
+    print routers
     return routers
 
 
@@ -24,7 +25,7 @@ def getAllRouterMethods():
     router_methods = {}
     for router_name in all_routers.keys():
         data = {'router': router_name}
-        api = ZenAPIConnector(router, router_endpoint, method, data)
+        api = ZenAPIConnector(router, method, data)
         response = api.send()
         sys.stdout.write('.')
         sys.stdout.flush()
