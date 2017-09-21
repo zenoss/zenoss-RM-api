@@ -2,6 +2,7 @@
 import requests
 from json import dumps
 from ConfigParser import RawConfigParser
+from RouterEndpointMap import RouterEndpointMap
 
 
 class ZenAPIConfig():
@@ -12,6 +13,7 @@ class ZenAPIConfig():
         self.username = self.config.get('zenoss_api', 'username')
         self.password = self.config.get('zenoss_api', 'password')
         self.ssl_verify = bool(self.config.get('zenoss_api', 'ssl_verify'))
+        self.router_endpoints = RouterEndpointMap()
 
     def getUrl(self):
         return self.url
@@ -25,13 +27,16 @@ class ZenAPIConfig():
     def getSSLVerify(self):
         return self.ssl_verify
 
+    def getRouterEndpoint(self, router_name):
+        return self.router_endpoints.getEndpoint(router_name)
+
 
 class ZenAPIConnector():
-    def __init__(self, router, router_endpoint, method, data):
+    def __init__(self, router, method, data):
         self.config = ZenAPIConfig()
         self.url = self.config.getUrl()
         self.router = router
-        self.router_endpoint = router_endpoint
+        self.router_endpoint = self.config.getRouterEndpoint(self.router)
         self.api_endpoint = self.url + self.router_endpoint
         self.method = method
         self.username = self.config.getUsername()
