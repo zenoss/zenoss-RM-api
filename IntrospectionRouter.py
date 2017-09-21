@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 import sys
-from ZenAPIConnector import ZenAPIConnector
+from ZenAPIConnector import ZenAPIConnector, ZenAPIConfig
 from pprint import pprint
 
-url = 'https://YOUR_URL.zenoss.com'
-ssl_verify = True
-username = 'api_user'
-password = 'PASSWORD'
+config_file = 'creds.cfg'
+
+config = ZenAPIConfig(config_file)
+
+url = config.getUrl()
+username = config.getUsername()
+password = config.getPassword()
+ssl_verify = config.getSSLVerify()
+
 router = 'IntrospectionRouter'
 router_endpoint = '/zport/dmd/introspection_router'
 
