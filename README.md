@@ -23,7 +23,7 @@ From there, you can import the ZenAPIConnector and instantiate it. It takes 3 ar
 - `method` - the name of the method you want to execute
 - `data` - a dictionary containing any information that needs to be passed to the method
 
-The `send()` method makes the HTTP request to the API and returns a response object. The response has a `json()` method that contains the JSON response in python format. 
+The `send()` method makes the HTTP request to the API and returns a response object. The response has a `json()` method that returns the JSON response in python format. 
 
 # Example 
 
@@ -34,7 +34,7 @@ method = 'getDevices'
 data = {'limit': 200}
 api = ZenAPIConnector(router, method, data)
 response = api.send()
-print response
+print response.json()
 
 ```
 
