@@ -42,7 +42,7 @@ class ZenAPIConnector():
     This class is instantiated with a router, method, and a data
     dictionary. The router endpoint URL is pulled from the
     RouterEndpointMap class.
-    ''''
+    '''
     def __init__(self, router, method, data):
         self.config = ZenAPIConfig()
         self.url = self.config.getUrl()
