@@ -14,6 +14,9 @@ method = 'getDevices'
 data = {'limit': 200}
 
 def getDevices():
+    '''
+    This makes the API call and returns data
+    '''
     api = ZenAPIConnector(router, method, data)
     response = api.send()
     resp_data = response.json()['result']
@@ -21,6 +24,11 @@ def getDevices():
 
 
 def deviceReport():
+    ''''
+    This sorts through the data and displays results in a 
+    .csv format. There are numerous other fields that can 
+    be displayed here, but here are a few as an example.
+    '''
     device_resp = getDevices()
     devices = device_resp['devices']
     print 'Name, IP Address, UID, ProdState, Collector, Location'
