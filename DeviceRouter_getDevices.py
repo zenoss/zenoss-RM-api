@@ -10,15 +10,14 @@ import sys
 from ZenAPIConnector import ZenAPIConnector
 
 router = 'DeviceRouter'
-
+method = 'getDevices'
+data = {'limit': 200}
 
 def getDevices():
-    method = 'getDevices'
-    data = {'limit': 200}
     api = ZenAPIConnector(router, method, data)
     response = api.send()
-    data = response.json()['result']
-    return data
+    resp_data = response.json()['result']
+    return resp_data
 
 
 def deviceReport():
