@@ -6,12 +6,12 @@
 # class written by Adam McCurdy @ Zenoss            #
 #####################################################
 
-import sys
 from ZenAPIConnector import ZenAPIConnector
 
 router = 'DeviceRouter'
 method = 'getDevices'
 data = {'limit': 200}
+
 
 def getDevices():
     '''
@@ -25,19 +25,19 @@ def getDevices():
 
 def deviceReport():
     ''''
-    This sorts through the data and displays results in a 
-    .csv format. There are numerous other fields that can 
+    This sorts through the data and displays results in a
+    .csv format. There are numerous other fields that can
     be displayed here, but here are a few as an example.
     '''
     device_resp = getDevices()
     devices = device_resp['devices']
     print 'Name, IP Address, UID, ProdState, Collector, Location'
     for dev in devices:
-        try: 
+        try:
             location = dev['location']['uid']
-        except (KeyError, TypeError): 
+        except (KeyError, TypeError):
             location = ''
-        print '%s, %s, %s, %s, %s, %s' % (dev['name'], 
+        print '%s, %s, %s, %s, %s, %s' % (dev['name'],
                                           dev['ipAddressString'],
                                           dev['uid'],
                                           dev['productionState'],
