@@ -14,9 +14,11 @@ method = 'moveDevice'
 
 usage = '%s <device_id> <device_class_name>' % (sys.argv[0])
 
+
 def fail():
     print 'Invalid arguments. \nUsage: %s' % (usage)
     sys.exit(1)
+
 
 def buildArgs():
     '''
@@ -31,9 +33,10 @@ def buildArgs():
             deviceClass = sys.argv[2]
         except:
             fail()
-    data = {'deviceName': device, 
+    data = {'deviceName': device,
             'deviceClass': deviceClass}
     return data
+
 
 def moveDevice(data):
     '''
@@ -43,6 +46,7 @@ def moveDevice(data):
     response = api.send()
     resp_data = response.json()['result']
     return resp_data
+
 
 if __name__ == '__main__':
     '''

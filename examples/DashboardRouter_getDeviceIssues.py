@@ -6,12 +6,12 @@
 # Adam McCurdy @ Zenoss                             #
 #####################################################
 
-import sys
 from ZenAPIConnector import ZenAPIConnector
 
 router = 'DashboardRouter'
 method = 'getDeviceIssues'
 data = {}
+
 
 def getDeviceIssues():
     '''
@@ -22,9 +22,10 @@ def getDeviceIssues():
     resp_data = response.json()['result']
     return resp_data
 
+
 def deviceIssuesReport():
     '''
-    This method sorts through the data and prints it out in 
+    his method sorts through the data and prints it out in
     .csv format. There are several other fields one might be
     interested in here, but here are a few as an example.
     '''
@@ -33,7 +34,8 @@ def deviceIssuesReport():
           'Warning, Error, Critical'
     for entry in report_data:
         device = entry['device']
-        deviceClass = entry['deviceClass']['uid'].replace('/zport/dmd/Devices', '')
+        deviceClass = entry['deviceClass']['uid']
+        deviceClass = deviceClass.replace('/zport/dmd/Devices', '')
         prodState = entry['productionStateLabel']
         events = entry['events']
         clear = events['clear']['count']
@@ -42,15 +44,16 @@ def deviceIssuesReport():
         warning = events['warning']['count']
         error = events['error']['count']
         critical = events['critical']['count']
-        print '%s, %s, %s, %s, %s, %s, %s, %s, %s' % (device, 
+        print '%s, %s, %s, %s, %s, %s, %s, %s, %s' % (device,
                                                       deviceClass,
-                                                      prodState, 
-                                                      clear, 
-                                                      debug, 
-                                                      info, 
-                                                      warning, 
-                                                      error, 
+                                                      prodState,
+                                                      clear,
+                                                      debug,
+                                                      info,
+                                                      warning,
+                                                      error,
                                                       critical)
+
 
 if __name__ == '__main__':
     '''

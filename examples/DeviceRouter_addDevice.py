@@ -14,9 +14,11 @@ method = 'addDevice'
 
 usage = '%s <device_id> <device_class_name> <productionState>' % (sys.argv[0])
 
+
 def fail():
     print 'Invalid arguments. \nUsage: %s' % (usage)
     sys.exit(1)
+
 
 def buildArgs():
     '''
@@ -32,10 +34,11 @@ def buildArgs():
             productionState = sys.argv[3]
         except:
             fail()
-    data = {'deviceName': device, 
-            'deviceClass': deviceClass, 
+    data = {'deviceName': device,
+            'deviceClass': deviceClass,
             'productionState': productionState}
     return data
+
 
 def addDevice(data):
     '''
@@ -45,6 +48,7 @@ def addDevice(data):
     response = api.send()
     resp_data = response.json()['result']
     return resp_data
+
 
 if __name__ == '__main__':
     '''
