@@ -14,7 +14,7 @@ class ZenAPIConfig():
     '''
     def __init__(self):
         self.config = RawConfigParser()
-        self.config.read('creds.cfg')
+        self.config.read('/root/zenoss_api/creds.cfg')
         self.url = self.config.get('zenoss_api', 'url')
         self.username = self.config.get('zenoss_api', 'username')
         self.password = self.config.get('zenoss_api', 'password')
