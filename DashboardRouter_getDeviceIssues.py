@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 #####################################################
-# This script is a basic example of how to create a #
-# list of devices and display device-related info   #
-# using the Zenoss JSON API and the ZenAPIConnector #
-# class written by Adam McCurdy @ Zenoss            #
+# This script is a basic example of how to create   #
+# display dashboard information using the Zenoss    #
+# JSON API and the ZenAPIConnector class written by #
+# Adam McCurdy @ Zenoss                             #
 #####################################################
 
 import sys
@@ -14,12 +14,20 @@ method = 'getDeviceIssues'
 data = {}
 
 def getDeviceIssues():
+    '''
+    This method makes the API call and returns the response
+    '''
     api = ZenAPIConnector(router, method, data)
     response = api.send()
     resp_data = response.json()['result']
     return resp_data
 
 def deviceIssuesReport():
+    '''
+    This method sorts through the data and prints it out in 
+    .csv format. There are several other fields one might be
+    interested in here, but here are a few as an example.
+    '''
     report_data = getDeviceIssues()['data']
     print 'Device, Device Class, ProdState, Clear, Debug, Info '\
           'Warning, Error, Critical'
@@ -45,4 +53,7 @@ def deviceIssuesReport():
                                                       critical)
 
 if __name__ == '__main__':
-    blah = deviceIssuesReport()
+    '''
+    Run the report
+    '''
+    deviceIssuesReport()
