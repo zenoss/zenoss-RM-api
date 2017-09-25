@@ -25,7 +25,7 @@ def getDeviceIssues():
 
 def deviceIssuesReport():
     '''
-    his method sorts through the data and prints it out in
+    This method sorts through the data and prints it out in
     .csv format. There are several other fields one might be
     interested in here, but here are a few as an example.
     '''
