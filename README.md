@@ -11,7 +11,7 @@ pip install requests pyOpenSSL ndg-httpsclient pyasn1
 
 If your scripts that leverage the ZenAPIConnector are in a different directory than `ZenAPIConnector.py`, `RouterEndpointMap.py`, and `creds.cfg`, then you'll need to:
  - Update `ZenAPIConnector.py` to include the absolute path to its config file
- - Make sure your $PYTHONPATH variable contains the path to the directory containing `ZenAPIConnector.py` and `RouterEndpointMap.py`
+ - Make sure your `$PYTHONPATH` environment variable contains the path to the directory containing `ZenAPIConnector.py` and `RouterEndpointMap.py`
 
 To get started, edit the `creds.cfg` file to point to your Zenoss instance. You'll also need to specify a username and password, as well as specify whether or not you want to enable certificate validation. 
 
@@ -20,6 +20,8 @@ To make any API calls with the ZenAPIConnector, you'll need the following files 
  - `creds.cfg`
  - `ZenAPIConnector.py`
  - `RouterEndpointMap.py`
+
+Update `ZenAPIConnector.py` to include the absolute path to your `creds.cfg` file. On my test box, I'm simply using a directory inside the root user's home directory.
 
 From there, you can import the ZenAPIConnector and instantiate it. It takes 3 arguments: 
 
