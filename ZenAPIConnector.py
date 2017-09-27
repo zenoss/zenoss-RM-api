@@ -119,10 +119,10 @@ class ZenDeviceUidFinder():
         self.router = 'DeviceRouter'
         self.method = 'getDevices'
         self.params = {}
-        if name:
+        if name is not None:
             self.params['name'] = name
-        if ip:
-            self.params['ip'] = ip
+        if ip is not None:
+            self.params['ipAddress'] = ip
         self.data = {'params': self.params}
         self.api_call = ZenAPIConnector(self.router,
                                         self.method,
