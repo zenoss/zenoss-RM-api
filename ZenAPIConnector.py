@@ -99,12 +99,55 @@ class ZenDeviceUuidFinder():
 
     def getAllUuids(self):
         try:
-            return self.response_json['result']['data']
+            return [x['uuid'] for x in self.response_json['result']['data']]
         except (KeyError, TypeError):
             return None
 
     def getCount(self):
         return self.count
+
+    def first(self):
+        return self.getFirstUuid()
+
+
+class ZenDeviceUidFinder():
+    '''
+    This class returns the name and UID (path) of a device when
+    provided a query
+    '''
+    def __init__(self, name=None, ip=None):
+        self.router = 'DeviceRouter'
+        self.method = 'getDevices'
+        self.params = {}
+        if name:
+            self.params['name'] = name
+        if ip:
+            self.params['ip'] = ip
+        self.data = {'params': self.params}
+        self.api_call = ZenAPIConnector(self.router,
+                                        self.method,
+                                        self.data)
+        self.response = self.api_call.send()
+        self.response_json = self.response.json()
+        self.count = len(self.response_json['result']['devices'])
+
+    def getFirstUid(self):
+        try:
+            return self.response_json['result']['devices'][0]['uid']
+        except (KeyError, TypeError):
+            return None
+
+    def getAllUids(self):
+        try:
+            return [x['uid'] for x in self.response_json['result']['devices']]
+        except (KeyError, TypeError):
+            return None
+
+    def getCount(self):
+        return self.count
+
+    def first(self):
+        return self.getFirstUid()
 
 
 class ZenJobsWatcher():
