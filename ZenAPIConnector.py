@@ -73,6 +73,40 @@ class ZenAPIConnector():
             print 'HTTP Status: %s' % (response.status_code)
 
 
+class ZenDeviceUuidFinder():
+    '''
+    This class returns the name and UUID of a device when
+    provided a query
+    '''
+    def __init__(self, query):
+        self.router = 'DeviceRouter'
+        self.method = 'getDeviceUuidsByName'
+        self.query = query
+        self.uuid = None
+        self.data = {'query': self.query}
+        self.api_call = ZenAPIConnector(self.router,
+                                        self.method,
+                                        self.data)
+        self.response = self.api_call.send()
+        self.response_json = self.response.json()
+        self.count = len(self.response_json['result']['data'])
+
+    def getFirstUuid(self):
+        try:
+            return self.response_json['result']['data'][0]['uuid']
+        except (KeyError, TypeError):
+            return None
+
+    def getAllUuids(self):
+        try:
+            return self.response_json['result']['data']
+        except (KeyError, TypeError):
+            return None
+
+    def getCount(self):
+        return self.count
+
+
 class ZenJobsWatcher():
     '''
     This class is instantiated with a job id. Its primary purpose
