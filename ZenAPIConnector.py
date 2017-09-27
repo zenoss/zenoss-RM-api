@@ -94,6 +94,12 @@ class ZenJobsWatcher():
         return status
 
     def watchStatus(self, jobid, timeout):
+        '''
+        This is a blocking method that will check on the status of
+        a job every n seconds until it's either completed, aborted,
+        failed, or a timeout is reached. It returns a tuple with the
+        success status of the job, and a bool for Success or Failure
+        '''
         self.success = 'Unknown'
         starttime = time()
         while self.success != 'SUCCESS':
@@ -102,8 +108,12 @@ class ZenJobsWatcher():
             if starttime + timeout <= currtime:
                 self.success = 'TIMEOUT'
                 break
-            sleep(10)
+            elif self.success == 'ABORTED':
+                break
+            sleep(3)
         if self.success == 'FAILURE':
+            return self.success, False
+        elif self.success == 'ABORTED':
             return self.success, False
         elif self.success == 'TIMEOUT':
             return self.success, False
