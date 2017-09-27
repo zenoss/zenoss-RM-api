@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import requests
+from time import time, sleep
 from json import dumps
 from ConfigParser import RawConfigParser
 from RouterEndpointMap import RouterEndpointMap
@@ -70,6 +71,45 @@ class ZenAPIConnector():
             return response
         else:
             print 'HTTP Status: %s' % (response.status_code)
+
+
+class ZenJobsWatcher():
+    '''
+    This class is instantiated with a job id. Its primary purpose
+    is to allow a user to perform a set of tasks that may require
+    a job to complete before moving on to another task.
+    '''
+    def __init__(self):
+        self.router = 'JobsRouter'
+
+    def checkJobStatus(self, jobid):
+        self.method = 'getInfo'
+        self.data = {'jobid': jobid}
+        api = ZenAPIConnector(self.router, self.method, self.data)
+        result = api.send()
+        try:
+            status = result.json()['result']['data']['status']
+        except (KeyError, ValueError):
+            status = 'UNKNOWN! Invalid Job ID or other failure'
+        return status
+
+    def watchStatus(self, jobid, timeout):
+        self.success = 'Unknown'
+        starttime = time()
+        while self.success != 'SUCCESS':
+            currtime = time()
+            self.success = self.checkJobStatus(jobid)
+            if starttime + timeout <= currtime:
+                self.success = 'TIMEOUT'
+                break
+            sleep(10)
+        if self.success == 'FAILURE':
+            return self.success, False
+        elif self.success == 'TIMEOUT':
+            return self.success, False
+        elif self.success == 'SUCCESS':
+            return self.success, True
+
 
 if __name__ == '__main__':
     pass
