@@ -19,7 +19,7 @@ class ZenAPIConfig():
         self.url = self.config.get('zenoss_api', 'url')
         self.username = self.config.get('zenoss_api', 'username')
         self.password = self.config.get('zenoss_api', 'password')
-        self.ssl_verify = bool(self.config.get('zenoss_api', 'ssl_verify'))
+        self.ssl_verify = self.config.get('zenoss_api', 'ssl_verify')
         self.router_endpoints = RouterEndpointMap()
 
     def getUrl(self):
@@ -32,7 +32,19 @@ class ZenAPIConfig():
         return self.password
 
     def getSSLVerify(self):
-        return self.ssl_verify
+        if self.ssl_verify == None:
+            return False
+        try: 
+            if self.ssl_verify.lower() == 'true':
+                return True
+            elif self.ssl_verify.lower() == 'false':
+                return False
+            else:
+                # default to True if they set anything other than "true" or "false"
+                return True
+        except AttributeError:
+            # TODO: add exception handling if something other than a string exists here
+            raise
 
     def getRouterEndpoint(self, router_name):
         return self.router_endpoints.getEndpoint(router_name)
