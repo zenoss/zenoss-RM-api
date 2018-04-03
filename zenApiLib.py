@@ -9,7 +9,6 @@ import json
 import ConfigParser
 from HTMLParser import HTMLParser
 import logging
-import copy
 
 
 class ZenAPIConnector():
@@ -19,14 +18,16 @@ class ZenAPIConnector():
     def __init__(self, section = 'default', cfgFilePath = "", routerName = None):
         self._url = ''
         self._routerName = ''
+        self._routersInfo = {}
         self._tid = 0
-        self.config = self._getConfigDetails(section, cfgFilePath)
-        self.routerEndpointMap = self.getRouterEndpointMappings()
-        self.requestSession = self.getRequestSession()
         self.log = logging.getLogger('zenApiLib.ZenAPIConnector')
-        if routerName:
+        self.requestSession = self.getRequestSession()
+        self.config = self._getConfigDetails(section, cfgFilePath)
+        if not routerName:
+            self.setRouter('IntrospectionRouter')
+        else:
             self.setRouter(routerName)
-        
+       
 
     def _getConfigDetails(self, section, cfgFilePath):
         '''
@@ -34,6 +35,7 @@ class ZenAPIConnector():
         same directory as the python library file & return parameters in
         specific 'section'.
         '''
+        self.log.info('_getConfigDetails; section:%s, cfgFilePath:%s' % (section, cfgFilePath))
         configurations = ConfigParser.ConfigParser()
         if cfgFilePath == "":
             cfgFilePath = os.path.realpath(
@@ -52,6 +54,7 @@ class ZenAPIConnector():
         Ensure 'creds.cfg' configuration file has required fields.
         Deal with special fields.
         '''
+        self.log.info('_sanitizeConfig; configuration:%s' %(configuration))
         if not ('url' in configuration):
             raise Exception('Configuration file missing "url" key')
         if not ('username' in configuration):
@@ -71,6 +74,7 @@ class ZenAPIConnector():
         '''
         Setup defaults for using the requests library 
         '''
+        self.log.info('getRequestSession;')
         s = requests.Session()
         retries = Retry(total=3,
                 backoff_factor=1,
@@ -92,14 +96,22 @@ class ZenAPIConnector():
         up entries. Note not all API router method calls support splitting up
         large results into manageable chunks (e.g. getDevices vs. getTriggers)
         '''
+        self.log.info('callMethod; method:%s, payload:%s' % (method, payload))
         apiResultsReturned = 0
         apiResultsTotal = 1
         limitApiCallResults = 50
-        if 'data' in payload:
-            if 'start' in payload['data']:
-                apiResultsReturned = payload['data'][0]['start']
-            if 'limit' in payload['data']:
-                limitApiCallResults = payload['data'][0]['limit']
+        # Check that specified method is valid, skip 'IntrospectionRouter' router methods
+        if self._routerName != 'IntrospectionRouter':
+            if not (method[0] in self._routersInfo[self._routerName]['methods'].keys()):
+                raise Exception("Specified router method '%s' is not an option. Available methods for '%s' router are: %s" % (
+                    method[0],
+                    self._routerName,
+                    self._routersInfo[self._routerName]['methods'].keys()
+                ))
+        if 'start' in payload:
+            apiResultsReturned = payload['start']
+        if 'limit' in payload:
+            limitApiCallResults = payload['limit']
         #
         if logging.getLogger().getEffectiveLevel() == 10:
             HTTPConnection.debuglevel = 1
@@ -113,12 +125,8 @@ class ZenAPIConnector():
                 'action': self._routerName,
                 'method': method[0],
                 'tid': self._tid,
-                'data': [{
-                    'start': apiResultsReturned,
-                    'limit': limitApiCallResults
-                }]
             }
-            apiBody['data'][0].update(payload)
+            apiBody['data'] = [payload]
             try:
                 r = self.requestSession.post(self._url,
                     auth=(self.config['username'], self.config['password']),
@@ -127,40 +135,50 @@ class ZenAPIConnector():
                     data=json.dumps(apiBody),
                 )
             except Exception as e:
-                self.log.error('Reqests exception: %s' % e)
-                yield json.dumps({'result': {'success': False} })
-                apiResultsTotal = -1
-            if r.status_code != 200:
-                self.log.error("API call returned a '%s' http status." % r.status_code)
-                self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
-                rJson = json.dumps({'result': {'success': False} })
+                msg = 'Reqests exception: %s' % e
+                self.log.error(msg)
+                rJson = {'result': {'success': False}, 'msg': msg}
                 apiResultsTotal = -1
             else:
-                if 'Content-Type' in r.headers:
-                    if 'application/json' in r.headers['Content-Type']:
-                        rJson = r.json()
-                        if not ('totalCount' in rJson['result']):
+                if r.status_code != 200:
+                    self.log.error("API call returned a '%s' http status." % r.status_code)
+                    self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
+                    rJson = {'result': {'success': False} }
+                    apiResultsTotal = -1
+                else:
+                    if 'Content-Type' in r.headers:
+                        if 'application/json' in r.headers['Content-Type']:
+                            rJson = r.json()
+                            if not ('totalCount' in rJson['result']):
+                                apiResultsTotal = -1
+                            else:
+                                apiResultsTotal = rJson['result']['totalCount']
+                                if 'start' in apiBody['data'][0]:
+                                    apiResultsReturned = apiBody['data'][0]['start'] + limitApiCallResults
+                                    apiBody['data'][0]['start'] = apiBody['data'][0]['start'] + limitApiCallResults
+                                else:
+                                    apiResultsReturned = limitApiCallResults
+                                    apiBody['data'][0]['start'] = limitApiCallResults
+                        elif 'text/html' in r.headers['Content-Type']:
+                            parser = TitleParser()
+                            parser.feed(r.text)
+                            msg = "HTML response from API call. HTML page title: '%s'" % parser.title
+                            self.log.error(msg)
+                            self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
+                            rJson = {'result': {'success': False}, 'msg': msg}
                             apiResultsTotal = -1
                         else:
-                            apiResultsTotal = rJson['result']['totalCount']
-                            apiResultsReturned = apiBody['data'][0]['start'] + len(rJson['result']['devices'])
-                    elif 'text/html' in r.headers['Content-Type']:
-                        parser = TitleParser()
-                        parser.feed(r.text)
-                        self.log.error("HTML response from API call. HTML page title: '%s'" % parser.title)
-                        self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
-                        rJson = json.dumps({'result': {'success': False} })
-                        apiResultsTotal = -1
+                            msg = "Unknown 'Content-Type' response header returned: '%s'" % r.headers['Content-Type']
+                            self.log.error(msg)
+                            self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
+                            rJson = {'result': {'success': False}, 'msg': msg}
+                            apiResultsTotal = -1
                     else:
-                        self.log.error("Unknown 'Content-Type' response header returned: '%s'" % r.headers['Content-Type'])
+                        msg = "Missing 'Content-Type' in API response's header"
+                        self.log.error(msg)
                         self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
-                        rJson = json.dumps({'result': {'success': False} })
+                        rJson = {'result': {'success': False}, 'msg': msg}
                         apiResultsTotal = -1
-                else:
-                    self.log.error("Missing 'Content-Type' in API response's header")
-                    self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
-                    rJson = json.dumps({'result': {'success': False} })
-                    apiResultsTotal = -1
             yield rJson
 
 
@@ -169,88 +187,59 @@ class ZenAPIConnector():
         Set object to specific API router.
         Basic error checking that specified router actually exisits.
         '''
-        if not (routerName in self.routerEndpointMap.keys()):
-            raise Exception("Specified router, '%s' is not a known API router" % routerName)
-        self._url = self.config['url'] + self.getEndpoint(routerName)
+        self.log.info('setRouter: routerName:%s' % (routerName))
+        routers = {}
+        # To query if specified router exists, first need to query all available routers.
+        # Temporarily setting to 'IntrospectionRouter' in order to do so.
+        self._routerName = 'IntrospectionRouter'
+        self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter')
+        # Query all available routers
+        if self._routersInfo == {}:
+            for apiResp in self.callMethod('getAllRouters'):
+                if not apiResp['result']['success']:
+                    raise Exception('getAllRouters call was not sucessful')
+
+                if not len(apiResp['result']['data']) > 0:
+                    raise Exception('getAllRouters call did not return any resilts')
+                
+                for resp in apiResp['result']['data']:
+                    routerKey = resp.get('action', 'unknown')
+                    routers[routerKey] = resp
+                    routers[routerKey]['methods'] = {}
+            self._routersInfo = dict(routers)
+        # Check router is valid
+        if not (routerName in self._routersInfo.keys()):
+            raise Exception("Specified router '%s' is not an option. Available routers are: %s" % (
+                routerName,
+                self._routersInfo.keys()
+            ))
+        # Query specified router's available methods
+        if self._routersInfo[routerName]['methods'] == {}:
+            for apiResp in self.callMethod('getRouterMethods', router = routerName):
+                if not apiResp['result']['success']:
+                    raise Exception('getRouterMethods call was not sucessful')
+                else:
+                    if not len(apiResp['result']['data']) > 0:
+                        raise Exception('getRouterMethods call did not return any resilts')
+                self._routersInfo[routerName]['methods'] = dict(apiResp['result']['data'])
+        # Set router
         self._routerName = routerName
-        return
+        self._url = self.config['url'] + self._getEndpoint(routerName)
+       
 
-
-    def getEndpoint(self, router):
+    def _getEndpoint(self, routerName):
         '''
         Return URL for specified API router.
-        Borrowed from original zenoss_api/RouterEndpointMap.py.
         '''
-        if router in self.routerEndpointMap.keys():
-            return self.routerEndpointMap.get(router)
+        self.log.info('_getEndpoint: router:%s' % (routerName))
+        if routerName in self._routersInfo.keys():
+            return self._routersInfo[routerName]['urlpath']
+        elif  routerName == 'IntrospectionRouter':
+            return '/zport/dmd/introspection_router'
         else:
             self.log.error('Router not found')
             return ""
-
-
-    def getRouterEndpointMappings(self):
-        '''
-        Return map of API router and its URL.
-        Borrowed from original zenoss_api/RouterEndpointMap.py.
-        '''
-        return {'AWSRouter': '/zport/dmd/aws_router',
-                'ApplicationRouter': '/zport/dmd/application_router',
-                'AzureRouter': '/zport/dmd/azure_router',
-                'CallhomeRouter': '/zport/dmd/callhome_router',
-                'CiscoUCSRouter': '/zport/dmd/ciscoucs_router',
-                'ComponentGroupRouter': '/zport/dmd/componentgroup_router',
-                'DashboardRouter': '/zport/dmd/dashboard_router',
-                'DetailNavRouter': '/zport/dmd/detailnav_router',
-                'DeviceDumpLoadRouter': '/zport/dmd/devicedumpload_router',
-                'DeviceManagementRouter': '/zport/dmd/devicemanagement_router',
-                'DeviceRouter': '/zport/dmd/device_router',
-                'DiagramRouter': '/zport/dmd/diagram_router',
-                'DistributedCollectorRouter': '/zport/dmd/dc_router',
-                'DynamicViewRouter': '/zport/dmd/dynamicservice_router',
-                'ElementPoolRouter': '/zport/dmd/elementpool_router',
-                'EnterpriseServicesRouter': '/zport/dmd/enterpriseservices_compat_router',
-                'EtlRouter': '/zport/dmd/etl_router',
-                'EventClassesRouter': '/zport/dmd/evclasses_router',
-                'EventsRouter': '/zport/dmd/evconsole_router',
-                'HostRouter': '/zport/dmd/host_router',
-                'HyperVRouter': '/zport/dmd/hyperv_router',
-                'ImpactRouter': '/zport/dmd/enterpriseservices_router',
-                'InsightRouter': '/zport/dmd/insight_router',
-                'IntrospectionRouter': '/zport/dmd/introspection_router',
-                'JobsRouter': '/zport/dmd/jobs_router',
-                'LDAPRouter': '/zport/dmd/ldap_router',
-                'LicensingRouter': '/zport/dmd/licensing_router',
-                'LogicalNodeRouter': '/zport/dmd/logicalnode_router',
-                'ManufacturersRouter': '/zport/dmd/manufacturers_router',
-                'MessagingRouter': '/zport/dmd/messaging_router',
-                'MibRouter': '/zport/dmd/mib_router',
-                'MonitorRouter': '/zport/dmd/monitor_router',
-                'MultiRealmRouter': '/zport/dmd/multirealm_router',
-                'Network6Router': '/zport/dmd/network_6_router',
-                'NetworkRouter': '/zport/dmd/network_router',
-                'OpenStackInfrastructureRouter': '/zport/dmd/openstackinfrastructure_router',
-                'OpenStackRouter': '/zport/dmd/openstack_router',
-                'ProcessRouter': '/zport/dmd/process_router',
-                'PropertiesRouter': '/zport/dmd/properties_router',
-                'PropertyMonitorRouter': '/zport/dmd/propertymonitor_router',
-                'RelatedEventsRouter': '/zport/dmd/relatedevents_router',
-                'ReportRouter': '/zport/dmd/report_router',
-                'SAMLIdPRouter': '/zport/dmd/SAMLIdPRouter',
-                'SearchRouter': '/zport/dmd/search_router',
-                'ServiceRouter': '/zport/dmd/service_router',
-                'ServiceTemplatesRouter': '/zport/dmd/servicetemplates_router',
-                'SettingsRouter': '/zport/dmd/settings_router',
-                'StorageBaseRouter': '/zport/dmd/storage_router',
-                'SupportRouter': '/zport/dmd/support_router',
-                'TemplateRouter': '/zport/dmd/template_router',
-                'TriggersRouter': '/zport/dmd/triggers_router',
-                'UsersRouter': '/zport/dmd/users_router',
-                'VCloudRouter': '/zport/dmd/vcloud_router',
-                'ZenPackRouter': '/zport/dmd/zenpack_router',
-                'ZenWebTxRouter': '/zport/dmd/zenwebtx_router',
-                'vSphereRouter': '/zport/dmd/vsphere_router'
-                }
-
+        
 
 # Get HTML page title. Used when 'text/html' Content-Type is returned
 # Borrowed from:
@@ -283,7 +272,7 @@ def log2stdout(loglevel):
     return logging.getLogger('zenApiLib')
 
 if __name__ == '__main__':
-    log = log2stdout(logging.INFO)
+    log = log2stdout(logging.WARN)
     # Some examples
     # API call: {"action":"DeviceRouter","method":"getDevices", "data": [ {"keys": ["productionState"], "params": {"productionState": [1000]},  "limit": 1, "start": 0} ], "tid":1}
     print "DeviceRouter: getDevices"
