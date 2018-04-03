@@ -20,6 +20,7 @@ class zenConnector():
         self._routerName = ''
         self._routersInfo = {}
         self._apiResultsRaw = False
+        self.configSectionName = section
         self._tid = 0
         self.log = logging.getLogger('zenApiLib.ZenConnector')
         self.requestSession = self.getRequestSession()
@@ -107,7 +108,7 @@ class zenConnector():
                 raise Exception("Specified router method '%s' is not an option. Available methods for '%s' router are: %s" % (
                     method[0],
                     self._routerName,
-                    self._routersInfo[self._routerName]['methods'].keys()
+                    sorted(self._routersInfo[self._routerName]['methods'].keys())
                 ))
         if 'start' in payload:
             apiResultsReturned = payload['start']
