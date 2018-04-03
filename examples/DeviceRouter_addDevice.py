@@ -7,7 +7,7 @@
 #####################################################
 
 import sys
-from ZenAPIConnector import ZenAPIConnector
+from zenApiLib import ZenAPIConnector
 
 router = 'DeviceRouter'
 method = 'addDevice'
