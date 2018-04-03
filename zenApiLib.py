@@ -11,7 +11,7 @@ from HTMLParser import HTMLParser
 import logging
 
 
-class ZenAPIConnector():
+class zenConnector():
     '''
     Enhanced API library embedding increased functionality & error handling
     '''
@@ -19,8 +19,9 @@ class ZenAPIConnector():
         self._url = ''
         self._routerName = ''
         self._routersInfo = {}
+        self._apiResultsRaw = False
         self._tid = 0
-        self.log = logging.getLogger('zenApiLib.ZenAPIConnector')
+        self.log = logging.getLogger('zenApiLib.ZenConnector')
         self.requestSession = self.getRequestSession()
         self.config = self._getConfigDetails(section, cfgFilePath)
         if not routerName:
@@ -127,6 +128,7 @@ class ZenAPIConnector():
                 'tid': self._tid,
             }
             apiBody['data'] = [payload]
+            #print "Manual DEBUG: %s" % apiBody
             try:
                 r = self.requestSession.post(self._url,
                     auth=(self.config['username'], self.config['password']),
@@ -179,7 +181,10 @@ class ZenAPIConnector():
                         self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
                         rJson = {'result': {'success': False}, 'msg': msg}
                         apiResultsTotal = -1
-            yield rJson
+            if self._apiResultsRaw:
+                yield r
+            else:
+                yield rJson
 
 
     def setRouter(self, routerName):
@@ -240,6 +245,29 @@ class ZenAPIConnector():
             self.log.error('Router not found')
             return ""
         
+class ZenAPIConnector(zenConnector):
+    '''
+    Backwards compatibility for zenoss_api/ZenAPIConnector.py
+    '''
+    def __init__(self, router, method, data):
+        self._url = ''
+        self._routerName = ''
+        self._routersInfo = {}
+        self._apiResultsRaw = False
+        self._tid = 0
+        self.log = logging.getLogger('zenApiLib.ZenAPIConnector')
+        self.log.warn('This is a backwards compatibility adapter.')
+        print "WARN: This is a backwards compatibility adapter."
+        self.requestSession = self.getRequestSession()
+        self.config = self._getConfigDetails('default', '')
+        self.setRouter(router)
+        self.method = method
+        self.data = data
+        
+    def send(self):
+        self._apiResultsRaw = True
+        return list(self.callMethod(self.method, **self.data))[0]
+
 
 # Get HTML page title. Used when 'text/html' Content-Type is returned
 # Borrowed from:
