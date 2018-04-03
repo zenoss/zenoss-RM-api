@@ -5,6 +5,11 @@
 # Zenoss JSON API and the ZenAPIConnector class     #
 # written by Adam McCurdy @ Zenoss                  #
 #####################################################
+#
+# SMA
+# Does not work, no DeviceRouter method 'moveDevice'.
+# There is 'moveDevices', but requires diff parameters to be passed.
+#
 
 import sys
 from ZenAPIConnector import ZenAPIConnector
@@ -54,4 +59,5 @@ if __name__ == '__main__':
     '''
     data = buildArgs()
     api_response = moveDevice(data)
+    print data
     print api_response

@@ -5,30 +5,25 @@ import json
 from sys import exit
 import os
 from urlparse import urlparse
-from ZenAPIConnector import ZenAPIConnector
+import zenApiLib
 
-zenInstance = 'unknown'
+zenAPI = zenApiLib.zenConnector(section = 'default')
+zenInstance = urlparse(zenAPI.config['url']).hostname
 
 
 def TriggerRouter(sMethod, dData={}):
-    global zenInstance
-    sRouter = 'TriggersRouter'
-    api = ZenAPIConnector(sRouter, sMethod, dData)
-    response = api.send()
-    zenInstance = urlparse(api.url).hostname
-    if response is None:
-        # Todo: add error handling
-        print "Error"
-        exit(1)
-    respData = response.json()
-    if not respData['result']['success']:
-        print "ERROR: TriggerRouter %s method call non-successful" % sMethod
-        print respData
-        print "Data submitted was:"
-        print response.request.body
-        exit(1)
+    resp = []
+    zenAPI.setRouter('TriggersRouter')
+    for respData in zenAPI.callMethod(sMethod, **dData):
+        if not respData['result']['success']:
+            print "ERROR: TriggerRouter %s method call non-successful" % sMethod
+            print respData
+            print "Data submitted was:"
+            print response.request.body
+            exit(1)
+        resp += respData['result']['data']
     return respData['result']['data']
-
+    
 
 def write2File(sType, lData):
     exportPath = './export_%s' % zenInstance
