@@ -217,7 +217,7 @@ class zenConnector():
         if not (routerName in self._routersInfo.keys()):
             raise Exception("Specified router '%s' is not an option. Available routers are: %s" % (
                 routerName,
-                self._routersInfo.keys()
+                sorted(self._routersInfo.keys())
             ))
         # Query specified router's available methods
         if self._routersInfo[routerName]['methods'] == {}:
