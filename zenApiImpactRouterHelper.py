@@ -57,3 +57,11 @@ class zenApiImpactRouterHelper():
                 }
             }
         return self.impact_request('addStateTrigger', [data])
+
+    def get_policies(self, contextUid, serviceUid, policyType):
+        data = { 
+            "contextUid": contextUid, 
+            "uid": serviceUid, 
+            "policyType": policyType,
+            }
+        return self.impact_request('getStateTriggers', [data])
