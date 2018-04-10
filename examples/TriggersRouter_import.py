@@ -23,16 +23,14 @@ bBlankOutUserInfo = True
 
 
 def TriggerRouter(sMethod, dData={}):
-    resp = []
     zenAPI.setRouter('TriggersRouter')
-    for respData in zenAPI.callMethod(sMethod, **dData):
-        if not respData['result']['success']:
-            print "ERROR: TriggerRouter %s method call non-successful" % sMethod
-            print respData
-            print "Data submitted was:"
-            print response.request.body
-            exit(1)
-        resp += respData['result']['data']
+    respData = zenAPI.callMethod(sMethod, **dData)
+    if not respData['result']['success']:
+        print "ERROR: TriggerRouter %s method call non-successful" % sMethod
+        print respData
+        print "Data submitted was:"
+        print response.request.body
+        exit(1)
     return respData['result']['data']
 
 
