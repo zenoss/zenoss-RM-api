@@ -15,7 +15,7 @@ class zenConnector():
     '''
     Enhanced API library embedding increased functionality & error handling
     '''
-    def __init__(self, section = 'default', cfgFilePath = "", routerName = None):
+    def __init__(self, section = 'default', cfgFilePath = "", routerName = None, loglevel = 40):
         self._url = ''
         self._routerName = ''
         self._routersInfo = {}
@@ -23,6 +23,7 @@ class zenConnector():
         self.configSectionName = section
         self._tid = 0
         self.log = logging.getLogger('zenApiLib.ZenConnector')
+        self.log.setLevel(loglevel)
         self.requestSession = self.getRequestSession()
         self.config = self._getConfigDetails(section, cfgFilePath)
         if not routerName:
@@ -91,14 +92,52 @@ class zenConnector():
         )
         return s
 
+
     def callMethod(self, *method, **payload):
+        '''
+        Call API directly and returns results directly. For paging API calls
+        use self.pagingMethodCall.
+        '''
+        self.log.info('callMethod; method:%s, payload:%s' % (method, payload))
+        if self.log.getEffectiveLevel() == 10:
+            HTTPConnection.debuglevel = 1
+        requests_log = logging.getLogger("requests.packages.urllib3")
+        requests_log.setLevel(self.log.getEffectiveLevel())
+        requests_log.propagate = True
+        self._tid += 1
+        apiBody = {
+            'action': self._routerName,
+            'method': method[0],
+            'tid': self._tid,
+        }
+        apiBody['data'] = [payload]
+        #print "Manual DEBUG: %s" % apiBody
+        try:
+            r = self.requestSession.post(self._url,
+                auth=(self.config['username'], self.config['password']),
+                verify=self.config['ssl_verify'],
+                headers={'content-type':'application/json'},
+                data=json.dumps(apiBody),
+            )
+        except Exception as e:
+            msg = 'Reqests exception: %s' % e
+            self.log.error(msg)
+            rJson = {'result': {'success': False}, 'msg': msg}
+            apiResultsTotal = -1
+        if self._apiResultsRaw:
+            return r
+        else:
+            return self._validateRawResponse(r)
+
+
+    def pagingMethodCall(self, *method, **payload):
         '''
         Returns an iterative, generator type object of API call results.
         Queries that return a large # of results (>50, default) will be broken
         up entries. Note not all API router method calls support splitting up
         large results into manageable chunks (e.g. getDevices vs. getTriggers)
         '''
-        self.log.info('callMethod; method:%s, payload:%s' % (method, payload))
+        self.log.info('pagingMethodCall; method:%s, payload:%s' % (method, payload))
         apiResultsReturned = 0
         apiResultsTotal = 1
         limitApiCallResults = 50
@@ -115,77 +154,69 @@ class zenConnector():
         if 'limit' in payload:
             limitApiCallResults = payload['limit']
         #
-        if logging.getLogger().getEffectiveLevel() == 10:
+        if self.log.getEffectiveLevel() == 10:
             HTTPConnection.debuglevel = 1
         requests_log = logging.getLogger("requests.packages.urllib3")
-        requests_log.setLevel(logging.getLogger().getEffectiveLevel())
+        requests_log.setLevel(self.log.getEffectiveLevel())
         requests_log.propagate = True
 
         while (apiResultsReturned < apiResultsTotal):
-            self._tid += 1
-            apiBody = {
-                'action': self._routerName,
-                'method': method[0],
-                'tid': self._tid,
-            }
-            apiBody['data'] = [payload]
-            #print "Manual DEBUG: %s" % apiBody
-            try:
-                r = self.requestSession.post(self._url,
-                    auth=(self.config['username'], self.config['password']),
-                    verify=self.config['ssl_verify'],
-                    headers={'content-type':'application/json'},
-                    data=json.dumps(apiBody),
-                )
-            except Exception as e:
-                msg = 'Reqests exception: %s' % e
-                self.log.error(msg)
-                rJson = {'result': {'success': False}, 'msg': msg}
+            self.log.info("pagingMethodCall: tid:%s, start:%s, limit:%s, estimatedTotal: %s" % (
+                self._tid,
+                apiResultsReturned,
+                limitApiCallResults,
+                limitApiCallResults))
+            rJson = self.callMethod(method[0], **payload)
+            # Increment Page from fields in the results
+            if not ('totalCount' in rJson['result']):
                 apiResultsTotal = -1
             else:
-                if r.status_code != 200:
-                    self.log.error("API call returned a '%s' http status." % r.status_code)
+                apiResultsTotal = rJson['result']['totalCount']
+                if 'start' in payload:
+                    apiResultsReturned = payload['start'] + limitApiCallResults
+                    payload['start'] += limitApiCallResults
+                else:
+                    apiResultsReturned = limitApiCallResults
+                    payload['start'] = limitApiCallResults
+            yield rJson
+
+
+    def _validateRawResponse(self, r):
+        '''
+        todo
+        '''
+        self.log.info("_validateRawResponse: passed object type of '%s'" % type(r))
+        if r.status_code != 200:
+            self.log.error("API call returned a '%s' http status." % r.status_code)
+            self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
+            rJson = {'result': {'success': False} }
+            apiResultsTotal = -1
+        else:
+            if 'Content-Type' in r.headers:
+                if 'application/json' in r.headers['Content-Type']:
+                    rJson = r.json()
+                    self.log.debug('_validateRawResponse: Response returned:\n%s' % rJson)
+                elif 'text/html' in r.headers['Content-Type']:
+                    parser = TitleParser()
+                    parser.feed(r.text)
+                    msg = "HTML response from API call. HTML page title: '%s'" % parser.title
+                    self.log.error(msg)
                     self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
-                    rJson = {'result': {'success': False} }
+                    rJson = {'result': {'success': False}, 'msg': msg}
                     apiResultsTotal = -1
                 else:
-                    if 'Content-Type' in r.headers:
-                        if 'application/json' in r.headers['Content-Type']:
-                            rJson = r.json()
-                            if not ('totalCount' in rJson['result']):
-                                apiResultsTotal = -1
-                            else:
-                                apiResultsTotal = rJson['result']['totalCount']
-                                if 'start' in apiBody['data'][0]:
-                                    apiResultsReturned = apiBody['data'][0]['start'] + limitApiCallResults
-                                    apiBody['data'][0]['start'] = apiBody['data'][0]['start'] + limitApiCallResults
-                                else:
-                                    apiResultsReturned = limitApiCallResults
-                                    apiBody['data'][0]['start'] = limitApiCallResults
-                        elif 'text/html' in r.headers['Content-Type']:
-                            parser = TitleParser()
-                            parser.feed(r.text)
-                            msg = "HTML response from API call. HTML page title: '%s'" % parser.title
-                            self.log.error(msg)
-                            self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
-                            rJson = {'result': {'success': False}, 'msg': msg}
-                            apiResultsTotal = -1
-                        else:
-                            msg = "Unknown 'Content-Type' response header returned: '%s'" % r.headers['Content-Type']
-                            self.log.error(msg)
-                            self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
-                            rJson = {'result': {'success': False}, 'msg': msg}
-                            apiResultsTotal = -1
-                    else:
-                        msg = "Missing 'Content-Type' in API response's header"
-                        self.log.error(msg)
-                        self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
-                        rJson = {'result': {'success': False}, 'msg': msg}
-                        apiResultsTotal = -1
-            if self._apiResultsRaw:
-                yield r
+                    msg = "Unknown 'Content-Type' response header returned: '%s'" % r.headers['Content-Type']
+                    self.log.error(msg)
+                    self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
+                    rJson = {'result': {'success': False}, 'msg': msg}
+                    apiResultsTotal = -1
             else:
-                yield rJson
+                msg = "Missing 'Content-Type' in API response's header"
+                self.log.error(msg)
+                self.log.debug("API EndPoint response: %s\n%s ", r.reason, r.text)
+                rJson = {'result': {'success': False}, 'msg': msg}
+                apiResultsTotal = -1
+        return rJson
 
 
     def setRouter(self, routerName):
@@ -201,17 +232,17 @@ class zenConnector():
         self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter')
         # Query all available routers
         if self._routersInfo == {}:
-            for apiResp in self.callMethod('getAllRouters'):
-                if not apiResp['result']['success']:
-                    raise Exception('getAllRouters call was not sucessful')
+            apiResp = self.callMethod('getAllRouters')
+            if not apiResp['result']['success']:
+                raise Exception('getAllRouters call was not sucessful')
 
-                if not len(apiResp['result']['data']) > 0:
-                    raise Exception('getAllRouters call did not return any resilts')
-                
-                for resp in apiResp['result']['data']:
-                    routerKey = resp.get('action', 'unknown')
-                    routers[routerKey] = resp
-                    routers[routerKey]['methods'] = {}
+            if not len(apiResp['result']['data']) > 0:
+                raise Exception('getAllRouters call did not return any resilts')
+            
+            for resp in apiResp['result']['data']:
+                routerKey = resp.get('action', 'unknown')
+                routers[routerKey] = resp
+                routers[routerKey]['methods'] = {}
             self._routersInfo = dict(routers)
         # Check router is valid
         if not (routerName in self._routersInfo.keys()):
@@ -221,13 +252,13 @@ class zenConnector():
             ))
         # Query specified router's available methods
         if self._routersInfo[routerName]['methods'] == {}:
-            for apiResp in self.callMethod('getRouterMethods', router = routerName):
-                if not apiResp['result']['success']:
-                    raise Exception('getRouterMethods call was not sucessful')
-                else:
-                    if not len(apiResp['result']['data']) > 0:
-                        raise Exception('getRouterMethods call did not return any resilts')
-                self._routersInfo[routerName]['methods'] = dict(apiResp['result']['data'])
+            apiResp = self.callMethod('getRouterMethods', router = routerName)
+            if not apiResp['result']['success']:
+                raise Exception('getRouterMethods call was not sucessful')
+            else:
+                if not len(apiResp['result']['data']) > 0:
+                    raise Exception('getRouterMethods call did not return any resilts')
+            self._routersInfo[routerName]['methods'] = dict(apiResp['result']['data'])
         # Set router
         self._routerName = routerName
         self._url = self.config['url'] + self._getEndpoint(routerName)
@@ -267,7 +298,7 @@ class ZenAPIConnector(zenConnector):
         
     def send(self):
         self._apiResultsRaw = True
-        return list(self.callMethod(self.method, **self.data))[0]
+        return self.callMethod(self.method, **self.data)
 
 
 # Get HTML page title. Used when 'text/html' Content-Type is returned
@@ -305,17 +336,19 @@ if __name__ == '__main__':
     # Some examples
     # API call: {"action":"DeviceRouter","method":"getDevices", "data": [ {"keys": ["productionState"], "params": {"productionState": [1000]},  "limit": 1, "start": 0} ], "tid":1}
     print "DeviceRouter: getDevices"
-    zenAPI = ZenAPIConnector()
+    zenAPI = zenConnector()
     zenAPI.setRouter('DeviceRouter')
-    print list(zenAPI.callMethod(
+    devices = zenAPI.pagingMethodCall(
         'getDevices',
         keys = ["productionState"],
         params = {
             "productionState": [1000]
-        }
-    ))
+        },
+        limit = 2
+    )
+    for dev in devices:
+        print dev
     # API Call: {"action":"TriggersRouter","method":"getTriggers","data":[], "tid":1}
     print "TriggerRouter: getTriggers"
-    triggerAPI = ZenAPIConnector(routerName = 'TriggersRouter')
-    for i in triggerAPI.callMethod("getTriggers"):
-        print i
+    triggerAPI = zenConnector(routerName = 'TriggersRouter')
+    print triggerAPI.callMethod("getTriggers")
