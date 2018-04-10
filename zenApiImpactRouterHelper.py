@@ -10,11 +10,8 @@ class zenApiImpactRouterHelper():
         self.api = zenApiLib.zenConnector(section = 'default', routerName = 'ImpactRouter')
 
     def impact_request(self, method, data=[{}]):
-        # zenApiLib.zenConnector.callMethod is an iterative function, 
-        # forcing to 1st page of returned data '[0]'. Only important if 
-        # 'start' & 'limit' parameters are used.
-        results = list(self.api.callMethod(method, **dict(data[0])))
-        return results[0]['result']
+        results = self.api.callMethod(method, **dict(data[0]))
+        return results['result']
 
     def get_services_tree(self):
         return self.impact_request('getTree')[0]

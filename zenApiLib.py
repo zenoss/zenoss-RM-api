@@ -15,7 +15,7 @@ class zenConnector():
     '''
     Enhanced API library embedding increased functionality & error handling
     '''
-    def __init__(self, section = 'default', cfgFilePath = "", routerName = None, loglevel = 40):
+    def __init__(self, section = 'default', cfgFilePath = "", routerName = None, loglevel = 30):
         self._url = ''
         self._routerName = ''
         self._routersInfo = {}
