@@ -93,7 +93,7 @@ if not evtResp['result']['success']:
 ## API Router Helper Libraries:
 **Files**: zenApiDeviceRouterHelper.py, zenApiImpactRouterHelper.py
 
-Helper libraties that are router specific, should contain common, repeatbly used functionality.
+Helper libraries that are router specific, should contain common, repeatbly used functionality.
 
 ------
 
