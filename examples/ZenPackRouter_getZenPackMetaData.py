@@ -5,6 +5,7 @@ import zenApiLib
 if __name__ == '__main__':
     zenApi = zenApiLib.zenConnector()
     zenApi.setRouter('ZenPackRouter')
-    zps = zenApi.callMethod('getZenPackMetaData')
-    for zp in zps['result']['data'].keys():
-	print "%s: %s" % (zp, zps['result']['data'][zp]['version'])
+    apiResp = zenApi.callMethod('getZenPackMetaData')
+    for zpKey in sorted(apiResp['result']['data']):
+        zpMeta = apiResp['result']['data'][zpKey]
+        print zpMeta['name'], zpMeta['version'] 
