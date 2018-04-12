@@ -8,14 +8,20 @@ from requests.adapters import HTTPAdapter
 import json
 import ConfigParser
 from HTMLParser import HTMLParser
-import logging
+
+if not ('logging' in dir()):
+    import logging
+    logging.basicConfig(
+        format = '%(asctime)s %(levelname)s %(name)s: %(message)s'
+    )
+    logging.getLogger().setLevel(logging.ERROR)
 
 
 class zenConnector():
     '''
     Enhanced API library embedding increased functionality & error handling
     '''
-    def __init__(self, section = 'default', cfgFilePath = "", routerName = None, loglevel = 30):
+    def __init__(self, section = 'default', cfgFilePath = "", routerName = None, loglevel = 40):
         self._url = ''
         self._routerName = ''
         self._routersInfo = {}
@@ -99,6 +105,14 @@ class zenConnector():
         use self.pagingMethodCall.
         '''
         self.log.info('callMethod; method:%s, payload:%s' % (method, payload))
+        # Check that specified method is valid, skip 'IntrospectionRouter' router methods
+        if self._routerName != 'IntrospectionRouter':
+            if not (method[0] in self._routersInfo[self._routerName]['methods'].keys()):
+                raise Exception("Specified router method '%s' is not an option. Available methods for '%s' router are: %s" % (
+                    method[0],
+                    self._routerName,
+                    sorted(self._routersInfo[self._routerName]['methods'].keys())
+                ))
         if self.log.getEffectiveLevel() == 10:
             HTTPConnection.debuglevel = 1
         requests_log = logging.getLogger("requests.packages.urllib3")
@@ -124,6 +138,7 @@ class zenConnector():
             self.log.error(msg)
             rJson = {'result': {'success': False}, 'msg': msg}
             apiResultsTotal = -1
+            return rJson
         if self._apiResultsRaw:
             return r
         else:
@@ -141,24 +156,10 @@ class zenConnector():
         apiResultsReturned = 0
         apiResultsTotal = 1
         limitApiCallResults = 50
-        # Check that specified method is valid, skip 'IntrospectionRouter' router methods
-        if self._routerName != 'IntrospectionRouter':
-            if not (method[0] in self._routersInfo[self._routerName]['methods'].keys()):
-                raise Exception("Specified router method '%s' is not an option. Available methods for '%s' router are: %s" % (
-                    method[0],
-                    self._routerName,
-                    sorted(self._routersInfo[self._routerName]['methods'].keys())
-                ))
         if 'start' in payload:
             apiResultsReturned = payload['start']
         if 'limit' in payload:
             limitApiCallResults = payload['limit']
-        #
-        if self.log.getEffectiveLevel() == 10:
-            HTTPConnection.debuglevel = 1
-        requests_log = logging.getLogger("requests.packages.urllib3")
-        requests_log.setLevel(self.log.getEffectiveLevel())
-        requests_log.propagate = True
 
         while (apiResultsReturned < apiResultsTotal):
             self.log.info("pagingMethodCall: tid:%s, start:%s, limit:%s, estimatedTotal: %s" % (
@@ -321,34 +322,3 @@ class TitleParser(HTMLParser):
             self.title = data
             self.match = False
                 
-def log2stdout(loglevel):
-    '''
-    Setup logging
-    '''
-    logging.basicConfig(
-        format = '%(asctime)s %(levelname)s %(name)s: %(message)s'
-    )
-    logging.getLogger().setLevel(loglevel)
-    return logging.getLogger('zenApiLib')
-
-if __name__ == '__main__':
-    log = log2stdout(logging.WARN)
-    # Some examples
-    # API call: {"action":"DeviceRouter","method":"getDevices", "data": [ {"keys": ["productionState"], "params": {"productionState": [1000]},  "limit": 1, "start": 0} ], "tid":1}
-    print "DeviceRouter: getDevices"
-    zenAPI = zenConnector()
-    zenAPI.setRouter('DeviceRouter')
-    devices = zenAPI.pagingMethodCall(
-        'getDevices',
-        keys = ["productionState"],
-        params = {
-            "productionState": [1000]
-        },
-        limit = 2
-    )
-    for dev in devices:
-        print dev
-    # API Call: {"action":"TriggersRouter","method":"getTriggers","data":[], "tid":1}
-    print "TriggerRouter: getTriggers"
-    triggerAPI = zenConnector(routerName = 'TriggersRouter')
-    print triggerAPI.callMethod("getTriggers")
