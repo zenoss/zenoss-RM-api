@@ -9,6 +9,7 @@
 import sys
 from ZenAPIConnector import ZenAPIConnector, ZenJobsWatcher
 
+
 router = 'DeviceRouter'
 method = 'addDevice'
 
