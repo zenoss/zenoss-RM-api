@@ -5,12 +5,14 @@ import json
 from sys import exit, argv
 import os
 from urlparse import urlparse
-from ZenAPIConnector import ZenAPIConnector
+import logging
+import zenApiLib
 
 
 # Global Variables
-iDebug = 0
-zenInstance = 'unknown'
+zenAPI = zenApiLib.zenConnector(section = 'default')
+zenAPI.log.setLevel(logging.WARN)
+zenInstance = urlparse(zenAPI.config['url']).hostname
 # For new system migration, need to be able to lookup user/group uuid update
 # import data with appropriate uuid.
 # #Under API, Not possible at this time
@@ -21,16 +23,8 @@ bBlankOutUserInfo = True
 
 
 def TriggerRouter(sMethod, dData={}):
-    global zenInstance
-    sRouter = 'TriggersRouter'
-    api = ZenAPIConnector(sRouter, sMethod, dData)
-    response = api.send()
-    zenInstance = urlparse(api.url).hostname
-    if response is None:
-        # Todo: add error handling
-        print "Error"
-        exit(1)
-    respData = response.json()
+    zenAPI.setRouter('TriggersRouter')
+    respData = zenAPI.callMethod(sMethod, **dData)
     if not respData['result']['success']:
         print "ERROR: TriggerRouter %s method call non-successful" % sMethod
         print respData
@@ -69,8 +63,7 @@ def getNameIdx(type):
     elif not (type in dTypeId.keys()):
         print "ERROR: Caching %s Name-ID index: no such type" % type
         return {}
-    if iDebug:
-        print "INFO: Caching Index for %ss" % type
+    log.debug("Caching Index for %ss" % type)
     lResult = TriggerRouter(dTypeId[type]['apiTriggerRouter'])
     return {k['name']: k[dTypeId[type]['idProperty']] for k in lResult}
 
@@ -88,8 +81,7 @@ def _getWindowNameIdx():
     }
     if len(dNotifsIndex) == 0:
         dNotifsIndex = getNameIdx('notification')
-    if iDebug:
-        print "INFO: Caching Index for Notification Windows"
+    log.debug("Caching Index for Notification Windows")
     for sWinName in dNotifsIndex.keys():
         lResult = TriggerRouter(
             dTypeId[type]['apiTriggerRouter'],
@@ -124,10 +116,9 @@ def getConfigOrCreate(type, data):
 def _createConfig(type, data):
     # Create config & return its config
     global dTrigsIndex, dNotifsIndex, dWinsIndex, dImportData
-    if iDebug:
-        print "INFO: Creating %s with name `%s`" % (
-            type, data['name']
-        )
+    log.debug("Creating %s with name `%s`" % (
+        type, data['name']
+    ))
     if type == 'trigger':
         sUuid = TriggerRouter('addTrigger', dData={"newId": data['name']})
         dTrigsIndex[data['name']] = sUuid
@@ -228,8 +219,8 @@ def specialFieldProcessing(data, warn=False):
                 lNotifSubscriptions.append(dTrigsIndex[dSub['name']])
             else:
                 if warn:
-                    print ("WARN: Unable to update subscription value, trigger"
-                           "'%s' does not exist ?") % (dSub['name'])
+                    log.info(("Unable to update subscription value, trigger"
+                           "'%s' does not exist ?") % (dSub['name']))
         data['subscriptions'] = lNotifSubscriptions
     # #Triggers: is this really needed, since the notification config defines
     # #this ?
@@ -240,8 +231,8 @@ def specialFieldProcessing(data, warn=False):
         for userFields in ['users', 'recipients']:
             if userFields in data:
                 if warn:
-                    print ("WARN: Import '%s' has been ignored and not set"
-                           " per script config") % (userFields)
+                    log.info(("Import '%s' has been ignored and not set"
+                           " per script config") % (userFields))
                 del data[userFields]
     # INSPECTOR_TYPE & META_TYPE, values of 'Maintenance Window' (v4) change
     # to 'MaintenanceWindow' (v5)
@@ -260,21 +251,19 @@ def compareData(dataA, dataB):
     for key in set(dataA.keys() + dataB.keys()):
         if not (key in dataA) or not (key in dataB):
             bSame = False
-            if iDebug >= 2:
-                print "DEBG: %s is present: A:%s B:%s" % (
-                    key,
-                    (key in dataA),
-                    (key in dataB)
-                )
+            log.debug("%s is present: A:%s B:%s" % (
+                key,
+                (key in dataA),
+                (key in dataB)
+            ))
             break
         elif dataA[key] != dataB[key]:
             bSame = False
-            if iDebug >= 2:
-                print "DEBG: %s value is different:\nA:%s\nB:%s" % (
-                    key,
-                    dataA[key],
-                    dataB[key]
-                )
+            log.debug("%s value is different:\nA:%s\nB:%s" % (
+                key,
+                dataA[key],
+                dataB[key]
+            ))
             break
     return bSame
 
@@ -286,10 +275,8 @@ def updateZenoss(type, data):
         'window': 'updateWindow'
     }
     if not compareData(data, dZenConfig):
-        if iDebug:
-            print "INFO: Updating %s" % type
-        else:
-            print "        -Configuration Applied"
+        log.debug("Updating %s" % type)
+        log.info("Configuration Applied")
         TriggerRouter(dApiMethod[type], dData=data)
 
 
@@ -297,17 +284,23 @@ def diffData(type, data):
     dConfig = _getConfig(type, data)
     for key in dConfig.keys():
         if not (key in data):
-            print "WARN: Compare fail:"
-            print "  importNoKey: %s" % key
-            print "  zenoss conf: %s:%s" % (key, dConfig[key])
+            log.warn("Compare fail:\n  importNoKey: %s\n  zenoss conf: %s:%s" % (key, key, dConfig[key]))
         elif not (key in dConfig):
-            print "WARN: Compare fail:"
-            print "  import file: %s:%s" % (key, (key in data))
-            print "  zenossNoKey: %s" % key
+            log.warn("Compare fail:\n  import file: %s:%s\n  zenossNoKey: %s" % (key, (key in data),key))
         elif data[key] != dConfig[key]:
-            print "WARN: Compare fail:"
-            print "  import file: %s:%s" % (key, data[key])
-            print "  zenoss conf: %s:%s" % (key, dConfig[key])
+            log.warn("Compare fail:\n  import file: %s:%s\n  zenoss conf: %s:%s" % (key, data[key], key, dConfig[key]))
+
+            
+def log2stdout(loglevel):
+    '''
+    Setup logging
+    '''
+    logging.basicConfig(
+        format = '%(asctime)s %(levelname)s %(name)s: %(message)s'
+    )
+    logging.getLogger().setLevel(loglevel)
+    return logging.getLogger('importTriggersNotifications')
+
 
 dTrigsIndex = {}
 dNotifsIndex = {}
@@ -316,13 +309,14 @@ lTriggers = []
 lNotifications = []
 lWindows = []
 if __name__ == "__main__":
-    print "Script started, importing to %s" % zenInstance
+    log = log2stdout(logging.INFO)
+    log.info("Script started, importing to %s" % zenInstance)
     argv.pop(0)
     for sFileName in argv:
         if not os.path.isfile(sFileName):
             print "ERROR: %s does not exist, ignoring" % sFileName
             continue
-        print "INFO: Reading file %s" % sFileName
+        log.info("Reading file %s" % sFileName)
         oFile = open(sFileName, 'r')
         dImportData = json.loads(oFile.read())
         oFile.close()
@@ -340,23 +334,24 @@ if __name__ == "__main__":
     for dImportData in lTriggers + lNotifications + lWindows:
         if dImportData in lTriggers:
             type = "trigger"
-            print "INFO: Evaluating %s '%s'" % (type, dImportData['name'])
+            log.info("Evaluating %s '%s'" % (type, dImportData['name']))
             # Name Index of Notifications set in Zenoss
             if len(dTrigsIndex) == 0:
                 dTrigsIndex = getNameIdx(type)
         elif dImportData in lNotifications:
             type = "notification"
-            print "INFO: Evaluating %s '%s'" % (type, dImportData['name'])
+            log.info("Evaluating %s '%s'" % (type, dImportData['name']))
             # Name Index of Notifications set in Zenoss
             if len(dNotifsIndex) == 0:
                 dNotifsIndex = getNameIdx(type)
         elif dImportData in lWindows:
             type = "window"
-            print ("INFO: Evaluating notification schedule window '%s', for"
+            log.info(("Evaluating notification schedule window '%s', for"
                    "notification '%s'") % (
                         dImportData['name'],
                         dImportData['uid'].split('/')[4]
                     )
+            )
             # Name Index of Windows in Zenoss
             if dWinsIndex == {}:
                 dWinsIndex = getNameIdx(type)
@@ -369,4 +364,4 @@ if __name__ == "__main__":
         updateZenoss(type, dImportData)
         # compare, confirm update applied
         diffData(type, dImportData)
-    print "Script completed"
+    log.info("Script completed")

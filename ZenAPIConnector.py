@@ -5,6 +5,7 @@ from json import dumps
 from ConfigParser import RawConfigParser
 from RouterEndpointMap import RouterEndpointMap
 
+from zenApiLib import ZenAPIConnector
 
 class ZenAPIConfig():
     '''
@@ -50,7 +51,7 @@ class ZenAPIConfig():
         return self.router_endpoints.getEndpoint(router_name)
 
 
-class ZenAPIConnector():
+class ZenAPIConnector_v1():
     '''
     This class is instantiated with a router, method, and a data
     dictionary. The router endpoint URL is pulled from the
