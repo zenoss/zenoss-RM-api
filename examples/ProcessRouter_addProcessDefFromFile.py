@@ -3,6 +3,9 @@
 # This script is a basic example of how to add an   #
 # OS Process Definition into Zenoss Resource Manager#
 # using the Zenoss JSON API and ZenAPILib           #
+# in this example we use a text file where each     #
+# line contains a new process.  This was done so    #
+# the script could be re-used without modifying it  #
 #####################################################
 
 # stdlib Imports
