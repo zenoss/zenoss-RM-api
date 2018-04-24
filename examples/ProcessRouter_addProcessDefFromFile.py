@@ -20,7 +20,6 @@ def addProcessFromFile():
     '''
     processRouter = zenApiLib.zenConnector(routerName='ProcessRouter')
     file = open("Processlist.txt", "r")
-    import pdb; pdb.set_trace()
     for process in file:
         processRouter.callMethod('addNode', type="class", id=process.strip(), contextUid="/zport/dmd/Processes")
         processRouter.callMethod('setInfo', uid=(PROCESS_ROOT + '/' + process.strip()), includeRegex=('^[^ ]*' + process.strip() + '[^ /]*( |$)'))
