@@ -70,6 +70,10 @@ class zenConnector():
             raise Exception('Configuration file missing "username" key')
         if not ('password' in configuration):
             self.log.error('Configuration file missing "password" key')
+        if not ('timeout' in configuration):
+            configuration['timeout'] = 3
+        else:
+            configuration['timeout'] = float(configuration['timeout'])
         sslVerify = True
         if 'ssl_verify' in configuration:
             if configuration['ssl_verify'].lower() == 'false':
@@ -130,6 +134,7 @@ class zenConnector():
             r = self.requestSession.post(self._url,
                 auth=(self.config['username'], self.config['password']),
                 verify=self.config['ssl_verify'],
+                timeout=self.config['timeout'],
                 headers={'content-type':'application/json'},
                 data=json.dumps(apiBody),
             )
