@@ -30,8 +30,8 @@ class zenConnector():
         self._tid = 0
         self.log = logging.getLogger('zenApiLib.ZenConnector')
         self.log.setLevel(loglevel)
-        self.requestSession = self.getRequestSession()
         self.config = self._getConfigDetails(section, cfgFilePath)
+        self.requestSession = self.getRequestSession()
         if not routerName:
             self.setRouter('IntrospectionRouter')
         else:
@@ -74,6 +74,10 @@ class zenConnector():
             configuration['timeout'] = 3
         else:
             configuration['timeout'] = float(configuration['timeout'])
+        if not ('retries' in configuration):
+            configuration['retries'] = 3
+        else:
+            configuration['retries'] = float(configuration['retries'])
         sslVerify = True
         if 'ssl_verify' in configuration:
             if configuration['ssl_verify'].lower() == 'false':
@@ -89,7 +93,7 @@ class zenConnector():
         '''
         self.log.info('getRequestSession;')
         s = requests.Session()
-        retries = Retry(total=3,
+        retries = Retry(total=self.config['retries'],
                 backoff_factor=1,
                 status_forcelist=[ 500, 502, 503, 504 ])
         s.mount(
@@ -296,8 +300,8 @@ class ZenAPIConnector(zenConnector):
         self.log = logging.getLogger('zenApiLib.ZenAPIConnector')
         self.log.warn('This is a backwards compatibility adapter.')
         print "WARN: This is a backwards compatibility adapter."
-        self.requestSession = self.getRequestSession()
         self.config = self._getConfigDetails('default', '')
+        self.requestSession = self.getRequestSession()
         self.setRouter(router)
         self.method = method
         self.data = data
