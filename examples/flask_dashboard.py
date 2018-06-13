@@ -14,6 +14,7 @@ def getDevices():
     devices = resp['result']['devices']
     return devices
 
+
 @app.route('/')
 def drawIndex():
     devices = getDevices()
@@ -31,3 +32,11 @@ def drawIndex():
         page += '<td valign="top">%s</td></tr>' % dev['collector']
     page += '</table>'
     return page
+
+
+def main():
+    app.run()
+
+
+if __name__ == '__main__':
+    main()
