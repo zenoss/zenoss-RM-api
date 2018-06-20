@@ -26,7 +26,7 @@ class ZenDeviceUuidFinder():
 
     def getAllUuids(self):
         try:
-            return [x['uuid'] for x in self.result']]
+            return [x['uuid'] for x in self.result]
         except (KeyError, TypeError):
             return None
 
