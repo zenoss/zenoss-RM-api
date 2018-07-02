@@ -116,7 +116,7 @@ class zenConnector():
            override: self.callMethod('getDevices', override={"data": {"uid":"/zport/dmd/Devices","keys":["name","ipAddress",]})
         Some router methods pass data in a 'non-standard' way. Using the override method helps deal with that.
         '''
-        self.log.info('callMethod; method:%s, payload:%s' % (method, payload))                                                                              
+        self.log.info('callMethod; method:%s, payload:%s' % (method, payload))
         # Check that specified method is valid, skip 'IntrospectionRouter' router methods
         if self._routerName != 'IntrospectionRouter':
             if not (method[0] in self._routersInfo[self._routerName]['methods'].keys()):
