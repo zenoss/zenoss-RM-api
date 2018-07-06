@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #####################################################
-# This script is a basic example of how to add an   #
-# OS Process Definition into Zenoss Resource Manager#
+# This script is a basic example of how to change   #
+# attributes of a Windows Service Definition        #
 # using the Zenoss JSON API and ZenAPILib           #
 # in this example we use a text file where each     #
 # line contains a new process.  This was done so    #
