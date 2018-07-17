@@ -27,7 +27,6 @@ def resetIPAndRemodel():
          deviceRouter.callMethod('resetIp', uids=dev)
          deviceRouter.callMethod('remodel', deviceUid=dev)
          print "Resetting IP and Remodeling %s" % dev
-#
 
 if __name__ == '__main__':
     resetIPAndRemodel()
