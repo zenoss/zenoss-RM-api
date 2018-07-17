@@ -6,7 +6,6 @@
 #####################################################
 
 import zenApiLib
-import logging
 
 deviceRouter = zenApiLib.zenConnector(routerName='DeviceRouter')
 uid = '/zport/dmd/Groups/Testers'
