@@ -13,6 +13,11 @@ class StoreDictKeyPair(argparse.Action):
          if my_dict == None:
             my_dict = {}
          #Special routine, dealing when commas are in the value strings
+         #-Strategey; find 1st equal sign, and then the 2nd equal sign.
+         #-    From the 2nd equal sign string position, reverse search for
+         #-    comma. That comma delimits the split between passed parameters
+         #-    and ignores commas that are part of the passed parameters
+         #-    value.
          sSplit=[]
          sRaw = values
          while sRaw:
@@ -34,7 +39,10 @@ class StoreDictKeyPair(argparse.Action):
                 v = v.replace("'", '"')
                 my_dict[k] = json.loads(v)
              else:
-                my_dict[k] = v
+                if v.isdigit():
+                    my_dict[k] = int(v)
+                else:
+                    my_dict[k] = v
          setattr(namespace, self.dest, my_dict)
 
 
@@ -57,21 +65,38 @@ def buildArgs():
                     help = 'Default location being the same directory as the zenApiLib.py file')
     parser.add_argument('-d', dest='data', action=StoreDictKeyPair, metavar="KEY1=VAL1,KEY2=VAL2...",
                     help = "Parameters to pass to router's method function")
-    parser.add_argument('-x', dest='rValue', action='store', metavar="fieldName.fieldName...",
-                    default = 'result.success', help = "Return value from API result field. Default: 'result.success'")
+    parser.add_argument('-x', dest='rFields', action='append', metavar="fieldName.fieldName...",
+                    default = [], help = "Return value from API result field. Default: 'result.success'")
     return parser.parse_args()
 
 
 def nested_get(input_dict, nested_key):
+    '''
+    Pull a value from a nested dictionaries/lists
+    TODO: Able to work with wildcards, 'result.events.*.evid' or 'result.events.*.DeviceGroups.*.name', but needs work... need a use case to flesh out
+    '''
     internal_dict_value = input_dict
     for k in nested_key:
         if k.isdigit():
-            internal_dict_value = internal_dict_value[int(k)]
+            try:
+                internal_dict_value = internal_dict_value[int(k)]
+            except IndexError:
+                internal_dict_value = None
+        elif k == '*':
+            wcPos = nested_key.index('*')
+            wcValue = []
+            for wcEntry in internal_dict_value:
+                wcTmp = nested_get(wcEntry, nested_key[wcPos + 1:])
+                wcValue.append(wcTmp)
+            internal_dict_value = wcValue
+            break
         else:
             internal_dict_value = internal_dict_value.get(k, None)
         if internal_dict_value is None:
             return None
-    return internal_dict_value    
+    if isinstance(internal_dict_value, list):
+        internal_dict_value = ",".join(str(k) for k in internal_dict_value)
+    return str(internal_dict_value)
 
 
 if __name__ == '__main__':
@@ -82,19 +107,27 @@ if __name__ == '__main__':
     args = vars(buildArgs())
     log = logging.getLogger('zenApiLib')
     log.setLevel(args['loglevel'])
+    if args['rFields']:
+        rFields = args['rFields']
+    else:
+        rFields = ['result.success']
+    rTotalResults = {}
+    #Treat all API calls like paged calls
     zenapi  = zenConnector(routerName=args['rName'], cfgFilePath=args['configFilePath'],section = args['configSection'], loglevel = args['loglevel'])
-    apiResult = zenapi.callMethod(args['rMethod'], **args['data'])
+    for pagedResult in zenapi.pagingMethodCall(args['rMethod'], **args['data']):
+        for rFieldName in rFields:
+            if rFieldName.lower() == 'all':
+                pprint(pagedResult)
+            else:
+                if (not rFieldName in rTotalResults):
+                    rTotalResults[rFieldName] = nested_get(pagedResult, rFieldName.split('.'))
+                else:
+                    rTotalResults[rFieldName] = "{},{}".format(rTotalResults[rFieldName], nested_get(pagedResult, rFieldName.split('.')))
+    for k in rFields:
+        print "{}:{}".format(k, rTotalResults[k])
+    
+    sys.exit(0)
+    #apiResult = zenapi.callMethod(args['rMethod'], **args['data'])
     if not nested_get(apiResult, ['result', 'success']):
         pprint(apiResult)
         sys.exit(1)
-    else:
-        if args['rValue'].lower() == 'all':
-            pprint(apiResult)
-        else:
-            rValue = nested_get(apiResult, args['rValue'].split('.'))
-            if rValue:
-                print rValue
-            else:
-                print "-1"
-                #print "'%s' does not exist in API results:" 
-                #pprint(apiResult)
