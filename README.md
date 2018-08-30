@@ -21,7 +21,7 @@ This repository is a fork of https://github.com/amccurdy/zenoss_api and currentl
 - support multiple zenoss instance definitions in credential file
     - credential file name defaults to 'creds.cfg' and same directory as zenApiLib.py file
     - ability to specify credential file
-- Directly callable,  simple API interaction. Can be easily incorporated with existing shell scripts.
+- 'zenApiCli.py' script available. For simple, command line API interaction. Can be easily incorporated with existing shell scripts.
 
 ## Pre-requisites:
 This python library depends on the following: requests, pyOpenSSL, ndg-httpsclient, pyasn1
@@ -40,46 +40,51 @@ _Note_: The credentials `creds.cfg` file by default is expected to be in the sam
 
 ## Usage:
 
-1. Calling directly as a script:
+### zenApiCli.py
 
    1. Script help output:
    
       ```
-      $ ./zenApiLib.py -h
-      usage: zenApiLib.py [-h] [-v LOGLEVEL] -r routerName -m routerMethodName
-                          [-c credsSection] [-p credsFilePath]
-                          [-d KEY1=VAL1,KEY2=VAL2...] [-x fieldName.fieldName...]
+      $ ./zenApiCli.py --help
+        usage: zenApiCli.py [-h] [-v LOGLEVEL] -r routerName -m routerMethodName
+                            [-c credsSection] [-p credsFilePath]
+                            [-d KEY1=VAL1,KEY2=VAL2...] [-x fieldName.fieldName...]
 
-      Primarily a python library to be used with your python scripts. When called
-      directly, can be used to make simple API calls.
+        Command Line Interface to Zennos JSON API, can be used to make simple API
+        calls.
 
-      optional arguments:
-        -h, --help            show this help message and exit
-        -v LOGLEVEL           Set script logging level (DEBUG=10, INFO=20, WARN=30,
-                              *ERROR=40, CRTITICAL=50
-        -r routerName         API router name
-        -m routerMethodName   API router method to use
-        -c credsSection       zenApiLib credential configuration section (default)
-        -p credsFilePath      Default location being the same directory as the
-                              zenApiLib.py file
-        -d KEY1=VAL1,KEY2=VAL2...
-                              Parameters to pass to router's method function
-        -x fieldName.fieldName...
-                              Return value from API result field. Default:
-                              'result.success'
+        optional arguments:
+          -h, --help            show this help message and exit
+          -v LOGLEVEL           Set script logging level (DEBUG=10, INFO=20, WARN=30,
+                                *ERROR=40, CRTITICAL=50
+          -r routerName         API router name
+          -m routerMethodName   API router method to use
+          -c credsSection       zenApiLib credential configuration section (default)
+          -p credsFilePath      Default location being the same directory as the
+                                zenApiLib.pyfile
+          -d KEY1=VAL1,KEY2=VAL2...
+                                Parameters to pass to router's method function
+          -x fieldName.fieldName...
+                                Return value from API result field. Default:
+                                'result.success'. Special keyword 'all' to dump API
+                                results.
       ```
   
    1. Send an event:
       ```
-      ./zenApiLib.py -r EventsRouter -m add_event -d summary="this is a test",component="test" -d device="Null" -d severity=4,evclass="/Status" -d evclasskey="sma"
+      ./zenApiCli.py -r EventsRouter -m add_event -d summary="this is a test",component="test" -d device="Null" -d severity=4,evclass="/Status" -d evclasskey="sma"
       ```
 
    1. Get device's productionState value:
       ```
-      ./zenApiLib.py -r DeviceRouter -m getDevices -d uid="/zport/dmd/Devices/ControlCenter" -d params="{'ipAddress': '10.88.111.223'}" -x result.devices.0.productionState
+      ./zenApiCli.py -r DeviceRouter -m getDevices -d uid="/zport/dmd/Devices/ControlCenter" -d params="{'ipAddress': '10.88.111.223'}" -x result.devices.0.productionState
+      ```
+   1. Get all devices in a deviceClass and their statuses:
+      ```
+      ./zenApiCli.py -r DeviceRouter -m getDevices -d uid="/zport/dmd/Devices",keys='["name","status"]' -x result.devices.*.name -x result.devices.*.status
       ```
 
-2. Calling within a python script:
+### zenApiLib.py
 
    Once the **zenApiLib** library is imported you can then instantiate _zenConnector_ a few different ways:
 
@@ -136,3 +141,4 @@ _Note_: The credentials `creds.cfg` file by default is expected to be in the sam
 **Files**: zenApiDeviceRouterHelper.py, zenApiImpactRouterHelper.py
 
 Helper libraries that are router specific, should contain common, repeatbly used functionality.
+
