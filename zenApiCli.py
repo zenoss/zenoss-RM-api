@@ -73,7 +73,8 @@ def buildArgs():
     parser.add_argument('-x', dest='rFields', action='append',
                         metavar="fieldName.fieldName...", default=[],
                         help="Return value from API result field. Default: "
-                        "'result.success'")
+                        "'result.success'.\n Special keyword 'all' to dump API "
+                        "results.")
     return parser.parse_args()
 
 
@@ -154,4 +155,6 @@ if __name__ == '__main__':
                                                         rFieldName.split('.'))
                                                                )
     for k in rFields:
+        if k == 'all':
+            continue
         print "{}:{}".format(k, rTotalResults[k])
