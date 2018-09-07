@@ -70,8 +70,8 @@ def buildArgs():
                         'location being the same directory as the zenApiLib.py'
                         'file')
     parser.add_argument('-d', dest='data', action=StoreDictKeyPair,
-                        metavar="KEY1=VAL1,KEY2=VAL2...", help="Parameters to "
-                        "pass to router's method function")
+                        default={}, metavar="KEY1=VAL1,KEY2=VAL2...",
+                        help="Parameters to pass to router's method function")
     parser.add_argument('-x', dest='rFields', action='append',
                         metavar="fieldName.fieldName...", default=[],
                         help="Return value from API result field. Default: "
