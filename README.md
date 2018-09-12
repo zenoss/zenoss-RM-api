@@ -46,8 +46,8 @@ _Note_: The credentials `creds.cfg` file by default is expected to be in the sam
    
       ```
       $ ./zenApiCli.py --help
-        usage: zenApiCli.py [-h] [-v LOGLEVEL] -r routerName -m routerMethodName
-                            [-c credsSection] [-p credsFilePath]
+        usage: zenApiCli.py [-h] [-v LOGLEVEL] [-t TIMEOUT] -r routerName -m
+                            routerMethodName [-c credsSection] [-p credsFilePath]
                             [-d KEY1=VAL1,KEY2=VAL2...] [-x fieldName.fieldName...]
 
         Command Line Interface to Zennos JSON API, can be used to make simple API
@@ -57,6 +57,7 @@ _Note_: The credentials `creds.cfg` file by default is expected to be in the sam
           -h, --help            show this help message and exit
           -v LOGLEVEL           Set script logging level (DEBUG=10, INFO=20, WARN=30,
                                 *ERROR=40, CRTITICAL=50
+          -t TIMEOUT            Override API call creds file timeout setting
           -r routerName         API router name
           -m routerMethodName   API router method to use
           -c credsSection       zenApiLib credential configuration section (default)
