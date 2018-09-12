@@ -53,6 +53,8 @@ def buildArgs():
     parser.add_argument('-v', dest='loglevel', action='store', type=int,
                         default=30, help='Set script logging level (DEBUG=10,'
                         ' INFO=20, WARN=30, *ERROR=40, CRTITICAL=50')
+    parser.add_argument('-t', dest='timeout', action='store', type=int,
+                        help='Override API call creds file timeout setting') 
     parser.add_argument('-r', dest='rName', action='store',
                         metavar="routerName", required=True, help='API '
                         'router name')
@@ -68,8 +70,8 @@ def buildArgs():
                         'location being the same directory as the zenApiLib.py'
                         'file')
     parser.add_argument('-d', dest='data', action=StoreDictKeyPair,
-                        metavar="KEY1=VAL1,KEY2=VAL2...", help="Parameters to "
-                        "pass to router's method function")
+                        default={}, metavar="KEY1=VAL1,KEY2=VAL2...",
+                        help="Parameters to pass to router's method function")
     parser.add_argument('-x', dest='rFields', action='append',
                         metavar="fieldName.fieldName...", default=[],
                         help="Return value from API result field. Default: "
@@ -129,6 +131,9 @@ if __name__ == '__main__':
                 section=args['configSection'],
                 loglevel=args['loglevel']
     )
+    #cred file configuration override
+    if args['timeout']:
+        zenapi.config['timeout'] = args['timeout']
     for pagedResult in zenapi.pagingMethodCall(
                                         args['rMethod'],
                                         **args['data']
