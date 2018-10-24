@@ -138,7 +138,7 @@ if __name__ == '__main__':
                                         args['rMethod'],
                                         **args['data']
                                                ):
-        if not nested_get(pagedResult, ['result', 'success']):
+        if not nested_get(pagedResult, ['result', 'success']) != "False":
             pprint(pagedResult)
             print " "
             log.error("API success FALSE")
