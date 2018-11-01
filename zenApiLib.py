@@ -255,7 +255,7 @@ class zenConnector():
                 raise Exception('getAllRouters call was not sucessful')
 
             if not len(apiResp['result']['data']) > 0:
-                raise Exception('getAllRouters call did not return any resilts')
+                raise Exception('getAllRouters call did not return any results')
             
             for resp in apiResp['result']['data']:
                 routerKey = resp.get('action', 'unknown')
