@@ -1,4 +1,5 @@
 from zenApiLib import ZenAPIConnector
+import zenApiLib
 
 class ZenDeviceUuidFinder():
     '''
@@ -9,7 +10,7 @@ class ZenDeviceUuidFinder():
         self.uuid = None
         self.results = []
         self.log = logging.getLogger('zenApiDeviceRouterHelper.ZenDeviceUuidFinder')
-        deviceAPI = ZenAPIConnector(routerName = 'DeviceRouter')
+        deviceAPI = zenApiLib.zenConnector(routerName = 'DeviceRouter')
         apiResults = deviceAPI.callMethod('getDeviceUuidsByName', query = query)
         for resp in apiResults:
             if resp['result']['sucess']:
@@ -51,11 +52,9 @@ class ZenDeviceUidFinder():
         if ip is not None:
             self.params['ipAddress'] = ip
         self.data = {'params': self.params}
-        self.api_call = ZenAPIConnector(self.router,
-                                        self.method,
-                                        self.data)
-        self.response = self.api_call.send()
-        self.response_json = self.response.json()
+        self.api_call = zenApiLib.zenConnector()
+        self.api_call.setRouter(self.router)
+        self.response_json = self.api_call.callMethod(self.method, **self.data)
         self.count = len(self.response_json['result']['devices'])
 
     def getFirstUid(self):
