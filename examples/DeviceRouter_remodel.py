@@ -1,7 +1,7 @@
 #!/bin/env python
 import zenApiLib
 from zenApiDeviceRouterHelper import ZenDeviceUidFinder
-from zenJobsRouterHelper import watchStatus
+from zenApiJobsRouterHelper import watchStatus
 import argparse
 import sys
 from pprint import pprint
