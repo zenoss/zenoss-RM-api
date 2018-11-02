@@ -95,7 +95,7 @@ class zenConnector():
         s = requests.Session()
         retries = Retry(total=self.config['retries'],
                 backoff_factor=1,
-                status_forcelist=[ 500, 502, 503, 504 ])
+                status_forcelist=[ 500, 502, 503, 504, 405 ])
         s.mount(
             'https://',
             HTTPAdapter(max_retries=retries)
@@ -172,11 +172,13 @@ class zenConnector():
         self.log.info('pagingMethodCall; method:%s, payload:%s' % (method, payload))
         apiResultsReturned = 0
         apiResultsTotal = 1
-        limitApiCallResults = 50
+        limitApiCallResults = 100
         if 'start' in payload:
             apiResultsReturned = payload['start']
         if 'limit' in payload:
             limitApiCallResults = payload['limit']
+        else:
+            payload['limit'] = limitApiCallResults
 
         while (apiResultsReturned < apiResultsTotal):
             self.log.info("pagingMethodCall: tid:%s, start:%s, limit:%s, estimatedTotal: %s" % (
