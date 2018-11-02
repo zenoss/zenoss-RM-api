@@ -95,7 +95,7 @@ class zenConnector():
         s = requests.Session()
         retries = Retry(total=self.config['retries'],
                 backoff_factor=1,
-                status_forcelist=[ 500, 502, 503, 504 ])
+                status_forcelist=[ 500, 502, 503, 504, 405 ])
         s.mount(
             'https://',
             HTTPAdapter(max_retries=retries)
