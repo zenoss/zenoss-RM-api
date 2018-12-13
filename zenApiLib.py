@@ -66,10 +66,17 @@ class zenConnector():
         self.log.info('_sanitizeConfig; configuration:%s' %(configuration))
         if not ('url' in configuration):
             raise Exception('Configuration file missing "url" key')
-        if not ('username' in configuration):
-            raise Exception('Configuration file missing "username" key')
-        if not ('password' in configuration):
-            self.log.error('Configuration file missing "password" key')
+        #Collection Zone or Resource Manager
+        if 'cz' in configuration:
+            if not 'apikey' in configuration:
+                raise Exception('Configuration file missing "apikey" key')
+            configuration['url'] = configuration['url'] + '/' + configuration['cz']
+        elif 'username' in configuration:
+            if not 'password' in configuration:
+                self.log.error('Configuration file missing "password" key')
+        else:
+            #No username or cz prefix configure
+            raise Exception('Configuration missing username or collection zone prefix')
         if not ('timeout' in configuration):
             configuration['timeout'] = 3
         else:
@@ -143,13 +150,23 @@ class zenConnector():
             #preferred method
             apiBody['data'] = [payload]
         try:
-            r = self.requestSession.post(self._url,
-                auth=(self.config['username'], self.config['password']),
-                verify=self.config['ssl_verify'],
-                timeout=self.config['timeout'],
-                headers={'content-type':'application/json'},
-                data=json.dumps(apiBody),
-            )
+            if 'cz' in self.config:
+                r = self.requestSession.post(self._url,
+                    verify=self.config['ssl_verify'],
+                    timeout=self.config['timeout'],
+                    headers={'content-type': 'application/json',
+                             'z-api-key': self.config['apikey']},
+                    data=json.dumps(apiBody),
+                )
+            else:
+
+                r = self.requestSession.post(self._url,
+                    auth=(self.config['username'], self.config['password']),
+                    verify=self.config['ssl_verify'],
+                    timeout=self.config['timeout'],
+                    headers={'content-type':'application/json'},
+                    data=json.dumps(apiBody),
+                )
         except Exception as e:
             msg = 'Reqests exception: %s' % e
             self.log.error(msg)
