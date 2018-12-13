@@ -159,7 +159,6 @@ class zenConnector():
                     data=json.dumps(apiBody),
                 )
             else:
-
                 r = self.requestSession.post(self._url,
                     auth=(self.config['username'], self.config['password']),
                     verify=self.config['ssl_verify'],
