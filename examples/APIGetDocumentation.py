@@ -33,8 +33,8 @@ if __name__ == '__main__':
     logging.basicConfig(
         format='%(asctime)s %(levelname)s %(name)s: %(message)s'
     )
-    logging.getLogger().setLevel(logging.ERROR)
     args = vars(buildArgs())
+    logging.getLogger().setLevel(args['loglevel'])
     log = logging.getLogger(__file__)
     log.setLevel(args['loglevel'])
     if args['outFileName']:
