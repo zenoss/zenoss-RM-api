@@ -58,7 +58,7 @@ if __name__ == '__main__':
     if len(args['deviceClasses']) > 1:
         ignoreDefault = args['deviceClasses'].pop(0)
     for devClass in args['deviceClasses']:
-        # ?Bug? - work-around via multiple api calls
+        # ?Bug? (ZEN-31017) - work-around via multiple api calls
         # -- Get device classes first
         if args['exOrg']:
             print >>rOut, "#### {} extract of classes ####".format(devClass)
