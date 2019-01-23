@@ -34,7 +34,7 @@ def buildArgs():
     parser.add_argument('--deviceclass', dest='devClass', action='store',
                         default='/Devices', help='DeviceClass to report on.')
     parser.add_argument('-a', dest='includeThreshFields', action='append',
-                        default=['severity', 'minval', 'maxval'],
+                        default=['enabled', 'severity', 'escalateCount', 'minval', 'maxval', 'description', 'explanation', 'resolution'],
                         help='Include threshold field in report.')
     parser.add_argument('--showInheritedTemplates', dest='showInherited',
                         action='store_true', help='Show Templates that are inherited.')
