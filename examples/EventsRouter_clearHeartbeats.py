@@ -11,7 +11,7 @@ def buildArgs():
                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-v', dest='loglevel', action='store', type=int,
                         default=30, help='Set script logging level (DEBUG=10,'
-                        ' INFO=20, WARN=30, *ERROR=40, CRTITICAL=50')
+                        ' INFO=20, *WARN=30, ERROR=40, CRTITICAL=50')
     parser.add_argument('-p', dest='configFilePath', action='store',
                         metavar="credsFilePath", default='', help='Default '
                         'location being the same directory as the zenApiLib.py'
