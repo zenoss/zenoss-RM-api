@@ -1,7 +1,7 @@
 [default]
 # Set CZ for zenoss.io sites
 #cz=cz0
-#api-key=<my api key>
+#apikey=<my api key>
 url=https://myurl.site
 # If not using api-key, set a username and password
 username=myuser
