@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import zenApiLib
 import time
 import sys
@@ -7,7 +8,7 @@ usage = '%s <uid> <durationHours> <prodState> <name>' % (sys.argv[0])
 if len(sys.argv) != 5:
     print usage
     sys.exit(1)
-else: 
+else:
     uid = sys.argv[1]
     durationHours = sys.argv[2]
     prodState = sys.argv[3]
@@ -15,17 +16,19 @@ else:
 
 now = int(time.time())
 
-dmr = zenApiLib.setConnector(routerName='DeviceManagementRouter')
+dmr = zenApiLib.zenConnector()
 
-params = {"uid": uid, 
-          "id": "", 
-          "name": name, 
-          "startDateTime": now, 
-          "durationDays":"00", 
-          "durationHours": durationHours, 
-          "durationMinutes":"00", 
-          "repeat":"Never", 
-          "startProductionState": prodState, 
+dmr.setRouter(routerName='DeviceManagementRouter')
+
+params = {"uid": uid,
+          "id": "",
+          "name": name,
+          "startDateTime": now,
+          "durationDays":"00",
+          "durationHours": durationHours,
+          "durationMinutes":"00",
+          "repeat":"Never",
+          "startProductionState": prodState,
           "enabled": True
           }
 
