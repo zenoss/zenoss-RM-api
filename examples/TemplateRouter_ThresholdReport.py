@@ -42,6 +42,8 @@ def buildArgs():
                         action='store_true', help='Show Templates that are not bound.')
     parser.add_argument('--showAllDataSources', dest='showAllDS', action='store_true',
                         help='Show all DataSources, even if there is no threshold.')
+    parser.add_argument('--recursive', dest='recurseDeviceClass', action='store_true',
+                        help='Recurse given deviceClass and include sub-class Templates.')
     return parser.parse_args()
 
 
@@ -62,13 +64,16 @@ def getDeviceClassTemplates(id='Devices', tmplTree=[]):
         if tmplNode['path'] == id:
             # Found our target deviceClass. Now look at the templates bound here
             for template in tmplNode['children']:
-                if not template['isOrganizer']:
+                if template['isOrganizer'] and args['recurseDeviceClass']:
+                    dcTemplates.update(getDeviceClassTemplates(template['path'], tmplNode['children']))
+                else:
                     if args['showInherited'] or id in template['path']:
                         if args['showUnbound'] or template['iconCls'] in boundTmplIconCls:
                             dcName, tmplName = template['path'].split('/rrdTemplates/')
-                            dcTemplates[template['path']] = {
-                                                'deviceclassName': dcName,
-                                                'templateName': tmplName}
+                            if template['path'] not in dcTemplates:
+                                dcTemplates[template['path']] = {
+                                                    'deviceclassName': dcName,
+                                                    'templateName': tmplName}
             break
         elif tmplNode['path'] not in id:
             # Not our target, moving on
