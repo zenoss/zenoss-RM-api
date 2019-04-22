@@ -6,16 +6,13 @@
 # written by Adam McCurdy @ Zenoss                  #
 #####################################################
 #
-# SMA
-# Does not work, no DeviceRouter method 'moveDevice'.
-# There is 'moveDevices', but requires diff parameters to be passed.
-#
 
 import sys
-from ZenAPIConnector import ZenAPIConnector
+import zenApiLib
+from zenApiDeviceRouterHelper import ZenDeviceUidFinder
 
 router = 'DeviceRouter'
-method = 'moveDevice'
+method = 'moveDevices'
 
 usage = '%s <device_id> <device_class_name>' % (sys.argv[0])
 
@@ -39,18 +36,19 @@ def buildArgs():
         except:
             fail()
     data = {'deviceName': device,
-            'deviceClass': deviceClass}
+            'deviceClass': "/zport/dmd{}".format(deviceClass)}
     return data
 
 
-def moveDevice(data):
+def moveDevice(**data):
     '''
     This makes the API call and returns the result
     '''
-    api = ZenAPIConnector(router, method, data)
-    response = api.send()
-    resp_data = response.json()['result']
-    return resp_data
+    dr = zenApiLib.zenConnector(routerName = router)
+    response = dr.callMethod(method, **data)
+    if response.get('result', {}).get('success', False) is False:
+        raise Exception('API call returned unsucessful result.\n%s' % response)
+    return response['result']
 
 
 if __name__ == '__main__':
@@ -58,6 +56,10 @@ if __name__ == '__main__':
     Build the args and make the API call to add the device
     '''
     data = buildArgs()
-    api_response = moveDevice(data)
+    deviceFindResults = ZenDeviceUidFinder(name=data['deviceName'])
+    if deviceFindResults.getCount() > 1:
+        raise Exception('Multiple devices found that matched "%s"' % data['deviceName'])
+    data['uid'] = deviceFindResults.getFirstUid()
+    api_response = moveDevice(uids=data['uid'], target=data['deviceClass'])
     print data
     print api_response
