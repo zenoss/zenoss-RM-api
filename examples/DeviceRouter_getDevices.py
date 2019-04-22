@@ -6,21 +6,11 @@
 # class written by Adam McCurdy @ Zenoss            #
 #####################################################
 
-from ZenAPIConnector import ZenAPIConnector
+import zenApiLib
 
 router = 'DeviceRouter'
 method = 'getDevices'
-data = {'limit': 200}
-
-
-def getDevices():
-    '''
-    This makes the API call and returns data
-    '''
-    api = ZenAPIConnector(router, method, data)
-    response = api.send()
-    resp_data = response.json()['result']
-    return resp_data
+data = {'limit': 200, 'keys': ['name', 'ipAddressString', 'uid', 'productionState', 'collector']}
 
 
 def deviceReport():
@@ -29,20 +19,22 @@ def deviceReport():
     .csv format. There are numerous other fields that can
     be displayed here, but here are a few as an example.
     '''
-    device_resp = getDevices()
-    devices = device_resp['devices']
     print 'Name, IP Address, UID, ProdState, Collector, Location'
-    for dev in devices:
-        try:
-            location = dev['location']['uid']
-        except (KeyError, TypeError):
-            location = ''
-        print '%s, %s, %s, %s, %s, %s' % (dev['name'],
-                                          dev['ipAddressString'],
-                                          dev['uid'],
-                                          dev['productionState'],
-                                          dev['collector'],
-                                          location)
+    dr = zenApiLib.zenConnector(routerName = router)
+    for device_resp in dr.pagingMethodCall(method, **data):
+        if device_resp.get('result', {}).get('success', False) is False:
+            raise Exception('API call returned unsucessful result.\n%s' % device_resp)
+        for dev in device_resp['result']['devices']:
+            try:
+                location = dev['location']['uid']
+            except (KeyError, TypeError):
+                location = ''
+            print '%s, %s, %s, %s, %s, %s' % (dev['name'],
+                                              dev['ipAddressString'],
+                                              dev['uid'],
+                                              dev['productionState'],
+                                              dev['collector'],
+                                              location)
 
 
 if __name__ == '__main__':

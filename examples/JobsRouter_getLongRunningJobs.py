@@ -6,7 +6,8 @@
 # written by Adam McCurdy @ Zenoss                  #
 #####################################################
 
-from ZenAPIConnector import ZenAPIConnector
+import zenApiLib
+
 import time
 import datetime
 
@@ -31,10 +32,11 @@ def getJobs():
     '''
     This makes the API call and returns data
     '''
-    api = ZenAPIConnector(router, method, data)
-    response = api.send()
-    resp_data = response.json()['result']
-    return resp_data
+    dr = zenApiLib.zenConnector(routerName = router)
+    response = dr.callMethod(method, **data)
+    if response.get('result', {}).get('success', False) is False:
+        raise Exception('API call returned unsucessful result.\n%s' % response)
+    return response['result']
 
 
 def r_time(time):

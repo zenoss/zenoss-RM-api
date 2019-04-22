@@ -8,8 +8,10 @@
 #####################################################
 
 import sys
-from ZenAPIConnector import ZenAPIConnector, ZenJobsWatcher,\
-                            ZenDeviceUidFinder
+import zenApiLib
+from zenApiDeviceRouterHelper import ZenDeviceUidFinder
+from zenApiJobsRouterHelper import watchStatus
+
 
 router = 'DeviceRouter'
 method = 'addDevice'
@@ -46,10 +48,11 @@ def addDevice(data):
     '''
     This makes the API call and returns the result
     '''
-    api = ZenAPIConnector(router, method, data)
-    response = api.send()
-    resp_data = response.json()['result']
-    return resp_data['new_jobs'][0]['uuid']
+    dr = zenApiLib.zenConnector(routerName = router)
+    response = dr.callMethod(method, **data)
+    if response.get('result', {}).get('success', False) is False:
+        raise Exception('API call returned unsucessful result.\n%s' % response)
+    return response['result']['new_jobs'][0]['uuid']
 
 
 if __name__ == '__main__':
@@ -59,8 +62,7 @@ if __name__ == '__main__':
     data = buildArgs()
     api_response = addDevice(data)
     print 'Created job %s... watching job status' % (api_response)
-    zjw = ZenJobsWatcher()
-    jobstatus = zjw.watchStatus(api_response, 300)
+    jobstatus = watchStatus(api_response, 300)
     print 'Job status %s, Success: %s' % (jobstatus[0], jobstatus[1])
     devfind = ZenDeviceUidFinder(sys.argv[1])
     print 'Device UID is %s' % (devfind.first())

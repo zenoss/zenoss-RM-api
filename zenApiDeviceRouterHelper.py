@@ -1,6 +1,15 @@
 from zenApiLib import ZenAPIConnector
 import zenApiLib
 
+
+if not ('logging' in dir()):
+    import logging
+    logging.basicConfig(
+        format = '%(asctime)s %(levelname)s %(name)s: %(message)s'
+    )
+    logging.getLogger().setLevel(logging.ERROR)
+
+
 class ZenDeviceUuidFinder():
     '''
     This class returns the name and UUID of a device when
@@ -12,22 +21,23 @@ class ZenDeviceUuidFinder():
         self.log = logging.getLogger('zenApiDeviceRouterHelper.ZenDeviceUuidFinder')
         deviceAPI = zenApiLib.zenConnector(routerName = 'DeviceRouter')
         apiResults = deviceAPI.callMethod('getDeviceUuidsByName', query = query)
-        for resp in apiResults:
-            if resp['result']['sucess']:
-                self.results += resp['result']['data']
-            else:
-                self.log.error('Non-sucessful result returned: %s' % resp)
+        if apiResults.get('result', {}).get('success', False) is False:
+            raise Exception('Device query failed')
+        if apiResults['result']['data']:
+            self.results = apiResults['result']['data']
+        else:
+            self.log.error('Non-sucessful result returned: %s' % resp)
         self.count = len(self.results)
 
     def getFirstUuid(self):
         try:
-            return self.result[0]['uuid']
+            return self.results[0]['uuid']
         except (KeyError, TypeError):
             return None
 
     def getAllUuids(self):
         try:
-            return [x['uuid'] for x in self.result]
+            return [x['uuid'] for x in self.results]
         except (KeyError, TypeError):
             return None
 
