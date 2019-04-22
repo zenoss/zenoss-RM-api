@@ -6,21 +6,7 @@
 # Adam McCurdy @ Zenoss                             #
 #####################################################
 
-from ZenAPIConnector import ZenAPIConnector
-
-router = 'DashboardRouter'
-method = 'getDeviceIssues'
-data = {}
-
-
-def getDeviceIssues():
-    '''
-    This method makes the API call and returns the response
-    '''
-    api = ZenAPIConnector(router, method, data)
-    response = api.send()
-    resp_data = response.json()['result']
-    return resp_data
+import zenApiLib
 
 
 def deviceIssuesReport():
@@ -29,10 +15,13 @@ def deviceIssuesReport():
     .csv format. There are several other fields one might be
     interested in here, but here are a few as an example.
     '''
-    report_data = getDeviceIssues()['data']
     print 'Device, Device Class, ProdState, Clear, Debug, Info '\
           'Warning, Error, Critical'
-    for entry in report_data:
+    dr = zenApiLib.zenConnector(routerName = 'DashboardRouter')
+    report_data = dr.callMethod('getDeviceIssues')
+    if report_data.get('result', {}).get('success', False) is False:
+        raise Exception('API call returned unsucessful result.\n%s' % report_data)
+    for entry in report_data['result']['data']:
         device = entry['device']
         deviceClass = entry['deviceClass']['uid']
         deviceClass = deviceClass.replace('/zport/dmd/Devices', '')
