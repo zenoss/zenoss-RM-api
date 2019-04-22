@@ -105,3 +105,6 @@ ENV/
 
 # configfile
 *.cfg
+
+# visual studio code
+.vscode
