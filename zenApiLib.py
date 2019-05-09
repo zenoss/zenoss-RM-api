@@ -91,6 +91,11 @@ class zenConnector():
                 sslVerify = False
                 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         configuration['ssl_verify'] = sslVerify
+        disableSaml = False
+        if 'disable_saml' in configuration:
+            if configuration['disable_saml'].lower() == 'true':
+                disableSaml = True
+        configuration['disable_saml'] = disableSaml
         return configuration
 
 
@@ -265,7 +270,10 @@ class zenConnector():
         # To query if specified router exists, first need to query all available routers.
         # Temporarily setting to 'IntrospectionRouter' in order to do so.
         self._routerName = 'IntrospectionRouter'
-        self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter')
+        if config['disable_saml'] == True:
+            self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter') + '?saml=0'
+        else:
+            self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter')
         # Query all available routers
         if self._routersInfo == {}:
             apiResp = self.callMethod('getAllRouters')
@@ -297,7 +305,10 @@ class zenConnector():
             self._routersInfo[routerName]['methods'] = dict(apiResp['result']['data'])
         # Set router
         self._routerName = routerName
-        self._url = self.config['url'] + self._getEndpoint(routerName)
+        if self.config['disable_saml'] == True:
+            self._url = self.config['url'] + self._getEndpoint(routerName) + '?saml=0'
+        else: 
+            self._url = self.config['url'] + self._getEndpoint(routerName)
        
 
     def _getEndpoint(self, routerName):
@@ -306,7 +317,10 @@ class zenConnector():
         '''
         self.log.info('_getEndpoint: router:%s' % (routerName))
         if routerName in self._routersInfo.keys():
-            return self._routersInfo[routerName]['urlpath']
+            if config['disable_saml'] == True:
+                return self._routersInfo[routerName]['urlpath'] + '?saml=0'
+            else:
+                return self._routersInfo[routerName]['urlpath']
         elif  routerName == 'IntrospectionRouter':
             return '/zport/dmd/introspection_router'
         else:
