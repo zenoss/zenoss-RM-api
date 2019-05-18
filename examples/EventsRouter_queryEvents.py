@@ -17,19 +17,24 @@ def get_args():
 
         Example component search field:
 
-            "eth0"
+            --component "eth0"
 
         Example DeviceClass search field:
 
-            "/Server/SSH/Linux"
+            --deviceclass "/Server/SSH/Linux"
 
         Example EventClass search field:
 
-            "/Cmd/Fail"
+            --eventclass "/Cmd/Fail"
         
         Example EventState search field:
 
-            "Defaults to: [0, 1]"
+            Defaults to: 01 (New, Acknowledged)
+            For example, to filter on eventstates
+            of Closed and Cleared, you would use 
+            the following:
+
+            --eventstate 34 
 
             Possible values in list:
 
@@ -43,7 +48,11 @@ def get_args():
         
         Example severity search field:
 
-            "Defaults to: [5, 4, 3, 2]"
+            Defaults to: 5432 (Critical, Error, etc)
+            For example, to filter on Critical
+            and Error severity events:
+
+            --severity 54
 
             Possible values in list:
 
@@ -56,11 +65,12 @@ def get_args():
 
         Example Summary search field:
         
-            "SSH*"
+            --summary "SSH*"
         """
     )
     parser.add_argument(
         "--component",
+        type=str,
         help="Specify a component pattern filter",
     )
     parser.add_argument(
@@ -70,22 +80,27 @@ def get_args():
     )
     parser.add_argument(
         "--device",
+        type=str,
         help="Specify a Device patter filter",
     )
     parser.add_argument(
         "--deviceclass",
+        type=str,
         help="Specify a DeviceClass pattern filter",
     )
     parser.add_argument(
         "--eventkey",
+        type=str,
         help="Specify an eventKey pattern filter",
     )
     parser.add_argument(
         "--eventclasskey",
+        type=str,
         help="Specify an eventClassKey patter filter",
     )
     parser.add_argument(
         "--eventclass",
+        type=str,
         help="Specify an eventClass pattern filter",
     )
     parser.add_argument(
@@ -106,6 +121,7 @@ def get_args():
     )
     parser.add_argument(
         "--summary",
+        type=str,
         help="The event summary to search for",
     )
 
@@ -152,9 +168,15 @@ def makeQuery(data, count):
     strange evconsole query behavior observed:
     if count is less than limit, the query will return the same number
     of events as there are limits.  Otherwise, count will be used to
-    pull the count number of events.
+    pull the count number of events.  To work around this, we are
+    setting the value of limit to the value of count.
     """
-    count = count
+    if count:
+        count = count
+    else:
+        results = api.callMethod('query', **data)
+        count = results.get('result').get('totalCount')
+
     if count < data.get('limit'):
         data['limit'] = count
         results = api.callMethod('query', **data)
@@ -175,6 +197,7 @@ def makeQuery(data, count):
 
             except Exception as ex:
                 print(ex)
+
 
 def extractEvents(results):
     try:
@@ -201,7 +224,8 @@ if __name__ == '__main__':
     start = 0
     page = 1
 
-    #Build params dictionary and keys list for data dictionary
+    # Build params dictionary and keys list for data dictionary
+
     data = dict()
     params = dict()
 
@@ -245,6 +269,7 @@ if __name__ == '__main__':
         'message'
         ]
 
+    data.update(params = params)
     data.update(keys = keys)
 
     api = zenApiLib.zenConnector(routerName = 'EventsRouter')
