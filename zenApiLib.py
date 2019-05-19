@@ -44,6 +44,14 @@ class zenConnector():
         same directory as the python library file & return parameters in
         specific 'section'.
         '''
+        if isinstance(cfgFilePath, dict):
+            '''
+            Accept a dict of string values containing the input
+            instead of a configuration file path.
+            '''
+            configuration = self._sanitizeConfig(cfgFilePath)
+            return configuration
+
         self.log.info('_getConfigDetails; section:%s, cfgFilePath:%s' % (section, cfgFilePath))
         configurations = ConfigParser.ConfigParser()
         if cfgFilePath == "":
@@ -55,6 +63,7 @@ class zenConnector():
             raise Exception('Specified configuration section, "%s" not defined in "%s".' % (section, cfgFilePath)) 
         configuration = {item[0]: item[1] for item in configurations.items(section)}
         configuration = self._sanitizeConfig(configuration)
+        import pdb; pdb.set_trace()
         return configuration
 
 
