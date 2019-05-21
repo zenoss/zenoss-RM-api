@@ -44,6 +44,14 @@ class zenConnector():
         same directory as the python library file & return parameters in
         specific 'section'.
         '''
+        if isinstance(cfgFilePath, dict):
+            '''
+            Accept a dict of string values containing the input
+            instead of a configuration file path.
+            '''
+            configuration = self._sanitizeConfig(cfgFilePath)
+            return configuration
+        # Use configuration file
         self.log.info('_getConfigDetails; section:%s, cfgFilePath:%s' % (section, cfgFilePath))
         configurations = ConfigParser.ConfigParser()
         if cfgFilePath == "":
