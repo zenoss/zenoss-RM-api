@@ -7,10 +7,18 @@
 #####################################################
 
 from ZenAPIConnector import ZenAPIConnector
+import sys
 
 router = 'MibRouter'
 method = 'getOidMappings'
-data = {"uid":"/zport/dmd/Mibs/mibs/BRIDGE-MIB"}
+
+try:
+    MIB = sys.argv[1]
+    data = {"uid":MIB}
+    print data
+except:
+    data = {"uid":"/zport/dmd/Mibs/mibs/BRIDGE-MIB"}
+
 
 
 def getMibs():
