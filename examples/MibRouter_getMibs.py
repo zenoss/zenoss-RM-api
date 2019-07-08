@@ -9,9 +9,8 @@
 from ZenAPIConnector import ZenAPIConnector
 
 router = 'MibRouter'
-method = 'getOidMappings'
-data = {"uid":"/zport/dmd/Mibs/mibs/BRIDGE-MIB"}
-
+method = 'getOrganizerTree'
+data = {"id":"/zport/dmd/Mibs"}
 
 def getMibs():
     '''
@@ -30,11 +29,16 @@ def mibReport():
     be displayed here, but here are a few as an example.
     '''
     mib_resp = getMibs()
-    mibs = mib_resp['data']
-    print 'oid, UID'
-    for mib in mibs:
-        print '%s, %s' % (mib['oid'],
-                               mib['uid'])
+    mibs = mib_resp
+    for mib in mibs[0]['children']:
+        try:
+            if int(mib['text']['count']) > 0:
+                print '%s' % mib['path']
+        except:
+            print '%s' % mib['uid']
+
+        for child in mib['children']:
+            print"  %s" % child['uid']
 
 if __name__ == '__main__':
     mibReport()
