@@ -6,6 +6,13 @@
 # class written by Adam McCurdy @ Zenoss            #
 #####################################################
 
+# complex use-case:
+# IFS=$'\n'  
+# for  MIB in $(./examples/MibRouter_getMibs.py | grep zport | sed 's/^  //g')  
+# do 
+#   ./examples/MibRouter_getOids.py "$MIB" 
+# done
+
 from ZenAPIConnector import ZenAPIConnector
 import sys
 
