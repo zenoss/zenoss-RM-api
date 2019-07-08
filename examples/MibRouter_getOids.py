@@ -15,7 +15,6 @@ method = 'getOidMappings'
 try:
     MIB = sys.argv[1]
     data = {"uid":MIB}
-    print data
 except:
     data = {"uid":"/zport/dmd/Mibs/mibs/BRIDGE-MIB"}
 
