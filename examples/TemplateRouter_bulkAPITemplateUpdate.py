@@ -6,6 +6,7 @@
 # In this example we throw in a new script into the
 # datasource.  This is a pretty quick and dirty method #
 #####################################################
+from __future__ import print_function
 
 # stdlib Imports
 import json

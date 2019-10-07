@@ -1,5 +1,6 @@
-# Re id a device 
 #!/bin/env python
+# Re id a device
+from __future__ import print_function
 import zenApiLib
 from zenApiDeviceRouterHelper import ZenDeviceUidFinder
 from zenApiJobsRouterHelper import watchStatus

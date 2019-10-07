@@ -4,6 +4,7 @@
 # device into Zenoss Resource Manager using the     #
 # Zenoss JSON API and the Zenoss RM API Library    #
 #####################################################
+from __future__ import print_function
 
 
 import sys

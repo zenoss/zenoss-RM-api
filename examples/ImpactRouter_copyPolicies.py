@@ -7,6 +7,7 @@
 #
 # To run type:
 #     python impact_api_copy_paste_policy_gates.py
+from __future__ import print_function
 
 
 from zenApiImpactRouterHelper import (

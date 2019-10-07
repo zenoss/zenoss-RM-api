@@ -5,6 +5,7 @@
 # and re-model a device to handle a specific customer          #
 # use-case.                                                    #
 ################################################################
+from __future__ import print_function
 import sys
 import zenApiLib
 from zenApiDeviceRouterHelper import ZenDeviceUidFinder

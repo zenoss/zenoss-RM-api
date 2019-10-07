@@ -4,6 +4,7 @@
 # been modeled on or added to servers, along with their 
 # monitored state             
 #######################################################
+from __future__ import print_function
 import zenApiLib
 zenApi = zenApiLib.zenConnector()
 zenApi.setRouter('DeviceRouter')

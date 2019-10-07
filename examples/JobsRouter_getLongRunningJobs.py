@@ -5,6 +5,7 @@
 # the Zenoss JSON API and the ZenAPIConnector class #
 # written by Adam McCurdy @ Zenoss                  #
 #####################################################
+from __future__ import print_function
 
 import zenApiLib
 

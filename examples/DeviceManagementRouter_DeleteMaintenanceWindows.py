@@ -4,6 +4,7 @@
 # example of how to remove old maintenance windows from a      #
 # specific device                                              #
 ################################################################
+from __future__ import print_function
 import zenApiLib
 from time import time
 

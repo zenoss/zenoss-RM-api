@@ -1,4 +1,5 @@
 #!/bin/env python
+from __future__ import print_function
 import zenApiLib
 from zenApiDeviceRouterHelper import ZenDeviceUidFinder
 from zenApiJobsRouterHelper import watchStatus

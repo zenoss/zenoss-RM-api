@@ -7,6 +7,7 @@
 # line contains a new process.  This was done so    #
 # the script could be re-used without modifying it  #
 #####################################################
+from __future__ import print_function
 
 # stdlib Imports
 import json

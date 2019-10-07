@@ -4,6 +4,7 @@
 # addresses and remodel devices based on a device   #
 # organizer using the JSON API and zenAPILib        #
 #####################################################
+from __future__ import print_function
 
 import zenApiLib
 

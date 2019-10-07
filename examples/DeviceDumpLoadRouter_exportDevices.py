@@ -1,12 +1,18 @@
-#!/bin/env python
+#!/usr/bin/env python
+
+from __future__ import print_function
 import zenApiLib
 import argparse
 import sys
 import logging
 import os
-from urlparse import urlparse
 from datetime import date
 from pprint import pformat
+
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 def buildArgs():
     parser = argparse.ArgumentParser(description='Poll & display API Router & '
@@ -76,6 +82,7 @@ if __name__ == '__main__':
                 ))
                 print(apiResult['result']['data'], file=rOut)
             else:
+                pass
                 print("ERROR: API results nonsuccessfull\n{}".format(
                     pformat(apiResult)
                 ), file=sys.stderr)
@@ -96,6 +103,7 @@ if __name__ == '__main__':
                 ))
                 print(apiResult['result']['data'], file=rOut)
             else:
+                pass
                 print("ERROR: API results nonsuccessfull\n{}".format(
                     pformat(apiResult)
                 ), file=sys.stderr)
