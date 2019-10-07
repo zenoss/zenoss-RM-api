@@ -58,7 +58,7 @@ if __name__ == '__main__':
     newDeviceName = args['newDeviceName']
     results = ZenDeviceUidFinder(name=deviceName)
     if results.getCount() != 1:
-       print >> sys.stderr, 'Skipping "{}", found {} devices.'.format(deviceName, results.getCount())
+       print('Skipping "{}", found {} devices.'.format(deviceName, results.getCount()), file=sys.stderr)
        sys.exit()
         
     devUid = results.getFirstUid()
@@ -69,7 +69,7 @@ if __name__ == '__main__':
             retainGraphData=retainData
         )
     if not apiResult['result']['success']:
-       print >> sys.stderr, 'Renaming API call failed'
+       print('Renaming API call failed', file=sys.stderr)
        pprint(apiResult)
     else:
-       print >> rOut, "Renaming {} to {} initiated - Keeping data {}".format(deviceName, newDeviceName, retainData)
+       print("Renaming {} to {} initiated - Keeping data {}".format(deviceName, newDeviceName, retainData), file=rOut)

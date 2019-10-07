@@ -55,13 +55,13 @@ if __name__ == '__main__':
             if not pagedResults['result']['success']:
                 raise Exception(pagedResults['msg'])
         except Exception as e:
-            print >> sys.stderr, "ERROR: {!r}".format(e)
-            print >> sys.stderr, pformat(pagedResults)
+            print("ERROR: {!r}".format(e), file=sys.stderr)
+            print(pformat(pagedResults), file=sys.stderr)
             sys.exit(1)
         for event in pagedResults['result']['events']:
             issues[event['device']['text']] = event['summary']
     # Loop through Devices and report on model dates
-    print >> rOut, "Device Class, Device ID, Device Title, Last Modeled DateTime, Last Modeled Date, Production State, Model Events, Status Up/Down"
+    print("Device Class, Device ID, Device Title, Last Modeled DateTime, Last Modeled Date, Production State, Model Events, Status Up/Down", file=rOut)
     api.setRouter('DeviceRouter')
     for pagedResults in api.pagingMethodCall('getDevices',
                                              keys=['uid', 'id', 'name', 'status', 'lastCollected', 'productionStateLabel'],
@@ -70,11 +70,11 @@ if __name__ == '__main__':
             if not pagedResults['result']['success']:
                 raise Exception(pagedResults['msg'])
         except Exception as e:
-            print >> sys.stderr, "ERROR: {!r}".format(e)
-            print >> sys.stderr, pformat(pagedResults)
+            print("ERROR: {!r}".format(e), file=sys.stderr)
+            print(pformat(pagedResults), file=sys.stderr)
             sys.exit(1)
         for device in pagedResults['result']['devices']:
-            print >> rOut, '{},{},{},{},{},{},"{}",{}'.format(
+            print('{},{},{},{},{},{},"{}",{}'.format(
                 '/'.join(device['uid'].split('/')[4:-2]),
                 device['id'],
                 (device['name'] if device['name'] != device['id'] else ''),
@@ -85,4 +85,4 @@ if __name__ == '__main__':
                 device['productionStateLabel'],
                 issues.get(device['name'], 'No Events'),
                 ('UP' if device['status'] else 'DOWN')
-            )
+            ), file=rOut)

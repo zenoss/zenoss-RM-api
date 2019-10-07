@@ -59,11 +59,11 @@ def bulkUpdateTemplates():
        try: 
            dm_components = directoryMonitorComponents['result']['data'][0]['uid']
        except IndexError: 
-           print "Skipping because no directory monitor component"
+           print("Skipping because no directory monitor component")
            continue
        datasources = templateRouter.callMethod('getDataSources', uid=(dm_components + "/" + "DirectoryMonitor"))
        change_datasource = datasources['result']['data'][0]['uid']
        templateRouter.callMethod('setInfo', uid=(change_datasource), script=new_script)
-       print "Changing %s on %s" % (change_datasource, dev) 
+       print("Changing %s on %s" % (change_datasource, dev)) 
 if __name__ == '__main__':
     bulkUpdateTemplates()

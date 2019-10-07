@@ -63,10 +63,10 @@ def jobReport():
     jobs = getJobs()
     l_jobs = longRunning(jobs)
     if not l_jobs:
-        print 'No long running jobs found.'
+        print('No long running jobs found.')
     else:
-        print 'ScheduledTime, Status, Description, Started, UUID, '\
-            'User, Type'
+        print('ScheduledTime, Status, Description, Started, UUID, '\
+            'User, Type')
         for job in l_jobs:
                 scheduled = r_time(job['scheduled'])
                 status = job['status']
@@ -75,13 +75,13 @@ def jobReport():
                 uuid = job['uuid']
                 user = job['user']
                 jobtype = job['type']
-                print '%s, %s, %s, %s, %s, %s, %s' % (scheduled,
+                print('%s, %s, %s, %s, %s, %s, %s' % (scheduled,
                                                         status,
                                                         description,
                                                         started,
                                                         uuid,
                                                         user,
-                                                        jobtype)
+                                                        jobtype))
 
 
 if __name__ == '__main__':

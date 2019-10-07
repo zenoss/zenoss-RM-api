@@ -20,7 +20,7 @@ response = ZenDeviceUidFinder(name=device_id)
 if response.getCount() == 1:
     device_uid = response.getFirstUid()
 else:
-    print 'Found %s devices.' % (response.getCount())
+    print('Found %s devices.' % (response.getCount()))
     sys.exit(1)
 
 dr = zenApiLib.zenConnector(routerName = 'DeviceRouter')
@@ -28,4 +28,4 @@ dr = zenApiLib.zenConnector(routerName = 'DeviceRouter')
 delete_response = dr.callMethod('removeDevices', uids=device_uid, hashcheck="", action="delete")
 
 if delete_response['result']['success'] == True:
-    print 'Successfully deleted device: %s' % (device_uid)
+    print('Successfully deleted device: %s' % (device_uid))

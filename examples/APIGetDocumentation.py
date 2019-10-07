@@ -56,7 +56,7 @@ if __name__ == '__main__':
                 api.setRouter(apiRouterName)
             except Exception as e:
                 if not args['silent']:
-                    print e
+                    print(e)
                 continue
             if amName == "*":
                 mName = api._routersInfo[apiRouterName]['methods'].keys()
@@ -65,14 +65,14 @@ if __name__ == '__main__':
             for apiMethodName in mName:
                 if apiMethodName not in api._routersInfo[apiRouterName]['methods'].keys():
                     if not args['silent']:
-                        print "Specified router method '%s' is not an option. Available methods for '%s' router are: %s" % (
+                        print("Specified router method '%s' is not an option. Available methods for '%s' router are: %s" % (
                             apiMethodName,
                             apiRouterName,
                             sorted(api._routersInfo[apiRouterName]['methods'].keys())
-                        )
+                        ))
                     continue
                 mInfo = api._routersInfo[apiRouterName]['methods'][apiMethodName]
-                print >>rOut, (
+                print((
                     "ROUTER NAME: {}\n"
                     "METHOD NAME: {}\n"
                     "METHOD DOCUMENTATION: {}\n"
@@ -85,6 +85,6 @@ if __name__ == '__main__':
                         mInfo['args'],
                         mInfo['kwargs']
                     )
-                )
+                ), file=rOut)
         if len(rName) > 1:
-            print '======================================'
+            print('======================================')

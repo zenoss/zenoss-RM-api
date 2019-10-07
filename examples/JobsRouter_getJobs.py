@@ -30,8 +30,8 @@ def getJobs():
 
 def jobReport():
     jobs = getJobs()
-    print 'Scheduled, Status, Description, Started, UUID, '\
-          'Finished, User, Type'
+    print('Scheduled, Status, Description, Started, UUID, '\
+          'Finished, User, Type')
     for job in jobs['jobs']:
         scheduled = job['scheduled']
         status = job['status']
@@ -41,14 +41,14 @@ def jobReport():
         finished = job['finished']
         user = job['user']
         jobtype = job['type']
-        print '%s, %s, %s, %s, %s, %s, %s, %s' % (scheduled,
+        print('%s, %s, %s, %s, %s, %s, %s, %s' % (scheduled,
                                                   status,
                                                   description,
                                                   started,
                                                   uuid,
                                                   finished,
                                                   user,
-                                                  jobtype)
+                                                  jobtype))
 
 
 if __name__ == '__main__':

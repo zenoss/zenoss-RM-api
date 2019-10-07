@@ -278,5 +278,5 @@ if __name__ == '__main__':
     results = makeQuery(data, count)
 
     for result in results:
-        print(json.dumps(extractEvents(result)))
+        print((json.dumps(extractEvents(result))))
 

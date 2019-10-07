@@ -20,4 +20,4 @@ for device_uid in device_uids:
     # if the totalCount is greater than zero, let's print out the device name, component name, and the monitored state
     if getcomp_result['totalCount'] > 0:
         for component in getcomp_result['data']:
-            print '%s, %s, %s' % (device_uid, component['name'], component['monitored'])
+            print('%s, %s, %s' % (device_uid, component['name'], component['monitored']))

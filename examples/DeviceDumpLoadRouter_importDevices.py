@@ -50,9 +50,9 @@ if __name__ == '__main__':
                     data=fp.read())
     fp.close()
     if apiResult['result']['success']:
-        print >>sys.stderr, "Import successful, import stats: {}".format(
+        print("Import successful, import stats: {}".format(
             apiResult['result']['stats']
-        )
+        ), file=sys.stderr)
     else:
-        print >>sys.stderr, "ERROR: API results nonsuccessfull\n{}".format(
-            pformat(apiResult))
+        print("ERROR: API results nonsuccessfull\n{}".format(
+            pformat(apiResult)), file=sys.stderr)
