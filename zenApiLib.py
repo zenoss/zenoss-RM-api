@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 import os
-import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.packages.urllib3.util.retry import Retry
-from httplib import HTTPConnection
-from requests.adapters import HTTPAdapter
 import json
-import ConfigParser
-from HTMLParser import HTMLParser
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+# Try to import from python 2 locations, fallback to python3.
+try:
+    from httplib import HTTPConnection
+    from HTMLParser import HTMLParser
+    import ConfigParser
+except:
+    from http.client import HTTPConnection
+    from html.parser import HTMLParser
+    import configparser as ConfigParser
+
 
 if not ('logging' in dir()):
     import logging
@@ -344,7 +352,7 @@ class ZenAPIConnector(zenConnector):
         self._tid = 0
         self.log = logging.getLogger('zenApiLib.ZenAPIConnector')
         self.log.warn('This is a backwards compatibility adapter.')
-        print "WARN: This is a backwards compatibility adapter."
+        print("WARN: This is a backwards compatibility adapter.")
         self.config = self._getConfigDetails('default', '')
         self.requestSession = self.getRequestSession()
         self.setRouter(router)
@@ -378,6 +386,6 @@ class TitleParser(HTMLParser):
 
 
 if __name__ == '__main__':
-    print "For help reference the README.md file"
-    print "If you are trying to make a command line call to the API, all command line invocations functions have been moved to zenApiCli.py"
+    print("For help reference the README.md file")
+    print("If you are trying to make a command line call to the API, all command line invocations functions have been moved to zenApiCli.py")
     

@@ -140,7 +140,7 @@ if __name__ == '__main__':
                                                ):
         if not nested_get(pagedResult, ['result', 'success']) != "False":
             pprint(pagedResult)
-            print " "
+            print(" ")
             log.error("API success FALSE")
             sys.exit(1)
         for rFieldName in rFields:
@@ -162,4 +162,4 @@ if __name__ == '__main__':
     for k in rFields:
         if k == 'all':
             continue
-        print "{}:{}".format(k, rTotalResults[k])
+        print("{}:{}".format(k, rTotalResults[k]))
