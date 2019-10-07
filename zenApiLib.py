@@ -11,7 +11,7 @@ try:
     from httplib import HTTPConnection
     from HTMLParser import HTMLParser
     import ConfigParser
-except:
+except ImportError:
     from http.client import HTTPConnection
     from html.parser import HTMLParser
     import configparser as ConfigParser
