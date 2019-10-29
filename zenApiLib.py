@@ -86,7 +86,7 @@ class zenConnector():
         if 'cz' in configuration:
             if not 'apikey' in configuration:
                 raise Exception('Configuration file missing "apikey" key')
-            configuration['url'] = configuration['url'] + '/' + configuration['cz']
+            configuration['url'] = '{}/{}'.format(configuration['url'], configuration['cz'])
         elif 'username' in configuration:
             if not 'password' in configuration:
                 self.log.error('Configuration file missing "password" key')
@@ -286,10 +286,9 @@ class zenConnector():
         # To query if specified router exists, first need to query all available routers.
         # Temporarily setting to 'IntrospectionRouter' in order to do so.
         self._routerName = 'IntrospectionRouter'
+        self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter')
         if self.config['disable_saml'] == True:
-            self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter') + '?saml=0'
-        else:
-            self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter')
+            self._url +='?saml=0'
         # Query all available routers
         if self._routersInfo == {}:
             apiResp = self.callMethod('getAllRouters')
@@ -321,10 +320,9 @@ class zenConnector():
             self._routersInfo[routerName]['methods'] = dict(apiResp['result']['data'])
         # Set router
         self._routerName = routerName
+        self._url = self.config['url'] + self._getEndpoint(routerName)
         if self.config['disable_saml'] == True:
-            self._url = self.config['url'] + self._getEndpoint(routerName) + '?saml=0'
-        else: 
-            self._url = self.config['url'] + self._getEndpoint(routerName)
+            self._url +='?saml=0'
        
 
     def _getEndpoint(self, routerName):
