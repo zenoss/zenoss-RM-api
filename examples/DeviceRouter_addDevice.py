@@ -1,18 +1,11 @@
 #!/usr/bin/env python
-#####################################################
-# This script is a basic example of how to add a    #
-# device into Zenoss Resource Manager using the     #
-# Zenoss JSON API and the ZenAPIConnector class     #
-# written by Adam McCurdy @ Zenoss                  #
-#####################################################
-
 import sys
 import zenApiLib
 
 router = 'DeviceRouter'
 method = 'addDevice'
 
-usage = '%s <device_id> <device_class_name> <productionState>' % (sys.argv[0])
+usage = '%s <device_id> <device_class_name> <productionState> <collector>' % (sys.argv[0])
 
 
 def fail():
@@ -25,18 +18,20 @@ def buildArgs():
     This builds the data dictionary required for the API call. We check to
     make sure we have exactly the correct arguments, then return the dict
     '''
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 5:
         fail()
     else:
         try:
             device = sys.argv[1]
             deviceClass = sys.argv[2]
             productionState = sys.argv[3]
+            collector = sys.argv[4]
         except:
             fail()
     data = {'deviceName': device,
             'deviceClass': deviceClass,
-            'productionState': productionState}
+            'productionState': productionState,
+            'collector': collector}
     return data
 
 
