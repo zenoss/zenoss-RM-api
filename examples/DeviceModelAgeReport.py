@@ -61,10 +61,10 @@ if __name__ == '__main__':
         for event in pagedResults['result']['events']:
             issues[event['device']['text']] = event['summary']
     # Loop through Devices and report on model dates
-    print >> rOut, "Device Class, Device ID, Device Title, Last Modeled DateTime, Last Modeled Date, Production State, Model Events, Status Up/Down"
+    print >> rOut, "Device Class, Device ID, Device Title, Last Modeled DateTime, Last Modeled Date, Collector, Production State, Model Events, Status Up/Down"
     api.setRouter('DeviceRouter')
     for pagedResults in api.pagingMethodCall('getDevices',
-                                             keys=['uid', 'id', 'name', 'status', 'lastCollected', 'productionStateLabel'],
+                                             keys=['uid', 'id', 'name', 'status', 'lastCollected', 'collector', 'productionStateLabel'],
                                              sort='uid', dir='ASC'):
         try:
             if not pagedResults['result']['success']:
@@ -82,6 +82,7 @@ if __name__ == '__main__':
                     else time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(float(device['lastCollected'])))),
                 (device['lastCollected'] if isinstance(device['lastCollected'], (str, unicode)) 
                     else time.strftime('%Y/%m/%d', time.localtime(float(device['lastCollected'])))),
+                device['collector'],
                 device['productionStateLabel'],
                 issues.get(device['name'], 'No Events'),
                 ('UP' if device['status'] else 'DOWN')
