@@ -74,7 +74,7 @@ if __name__ == '__main__':
             print >> sys.stderr, pformat(pagedResults)
             sys.exit(1)
         for device in pagedResults['result']['devices']:
-            print >> rOut, '{},{},{},{},{},{},"{}",{}'.format(
+            print >> rOut, '{},{},{},{},{},{},{},"{}",{}'.format(
                 '/'.join(device['uid'].split('/')[4:-2]),
                 device['id'],
                 (device['name'] if device['name'] != device['id'] else ''),
