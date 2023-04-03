@@ -1,4 +1,5 @@
 #!/bin/env python
+from __future__ import print_function
 import zenApiLib
 from zenApiDeviceRouterHelper import ZenDeviceUidFinder
 from zenApiJobsRouterHelper import watchStatus
@@ -59,23 +60,23 @@ if __name__ == '__main__':
         try:
             validModelerPlugins = sorted(apiResult['result']['data'].keys())
         except Exception as e:
-            print >> sys.stderr, "ERROR getting modelerPlugins!"
-            print >> sys.stderr, pformat(apiResult)
-            print >> sys.stderr, e
+            print("ERROR getting modelerPlugins!", file=sys.stderr)
+            print(pformat(apiResult), file=sys.stderr)
+            print(e, file=sys.stderr)
             sys.exit(1)
         for mPlugin in args['modelerPlugins'].split("|"):
             if mPlugin not in validModelerPlugins:
-                print >> sys.stderr, "ERROR: Specified modelerPlugin '{}' is not an option. " \
+                print("ERROR: Specified modelerPlugin '{}' is not an option. " \
                       "Available plugins are: {}".format(
                         mPlugin,
                         validModelerPlugins
-                      )
+                      ), file=sys.stderr)
                 sys.exit(2)
     # Loop over specified devices
     for devName in args['deviceNames']:
         results = ZenDeviceUidFinder(name=devName)
         if results.getCount() != 1:
-            print >> sys.stderr, 'Skipping "{}", found {} devices.'.format(devName, results.getCount())
+            print('Skipping "{}", found {} devices.'.format(devName, results.getCount()), file=sys.stderr)
             continue
         devUid = results.getFirstUid()
         apiResult = api.callMethod(
@@ -85,19 +86,19 @@ if __name__ == '__main__':
             background=True
         )
         if not apiResult['result']['success']:
-            print 'Remodeling API cal failed'
+            print('Remodeling API cal failed')
             pprint(apiResult)
             continue
         else:
-            print >> rOut, "{} - {}".format(devName, apiResult['result']['jobId'])
+            print("{} - {}".format(devName, apiResult['result']['jobId']), file=rOut)
             jobIds.append([devName, apiResult['result']['jobId']])
     # Hold off exiting the script
     if args['wait']:
-        print >> rOut, "Waiting on remodel jobs to complete..."
+        print("Waiting on remodel jobs to complete...", file=rOut)
         for job in jobIds:
             devName, jobId = job
             jobSuccess = watchStatus(jobId)
             if not jobSuccess:
-                print >> rOut, "{} remodel job unsuccessful".format(devName)
+                print("{} remodel job unsuccessful".format(devName), file=rOut)
                 break
-            print >> rOut, "{} remodel job completed".format(devName)
+            print("{} remodel job completed".format(devName), file=rOut)

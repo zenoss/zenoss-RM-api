@@ -4,6 +4,7 @@
 # addresses and remodel devices based on a device   #
 # organizer using the JSON API and zenAPILib        #
 #####################################################
+from __future__ import print_function
 
 import zenApiLib
 
@@ -26,7 +27,7 @@ def resetIPAndRemodel():
      for dev in devlist:
          deviceRouter.callMethod('resetIp', uids=dev)
          deviceRouter.callMethod('remodel', deviceUid=dev)
-         print "Resetting IP and Remodeling %s" % dev
+         print("Resetting IP and Remodeling %s" % dev)
 
 if __name__ == '__main__':
     resetIPAndRemodel()

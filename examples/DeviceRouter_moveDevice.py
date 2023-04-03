@@ -5,7 +5,7 @@
 # Zenoss JSON API and the ZenAPIConnector class     #
 # written by Adam McCurdy @ Zenoss                  #
 #####################################################
-#
+from __future__ import print_function
 
 import sys
 import zenApiLib
@@ -18,7 +18,7 @@ usage = '%s <device_id> <device_class_name>' % (sys.argv[0])
 
 
 def fail():
-    print 'Invalid arguments. \nUsage: %s' % (usage)
+    print('Invalid arguments. \nUsage: %s' % (usage))
     sys.exit(1)
 
 
@@ -61,5 +61,5 @@ if __name__ == '__main__':
         raise Exception('Multiple devices found that matched "%s"' % data['deviceName'])
     data['uid'] = deviceFindResults.getFirstUid()
     api_response = moveDevice(uids=data['uid'], target=data['deviceClass'])
-    print data
-    print api_response
+    print(data)
+    print(api_response)

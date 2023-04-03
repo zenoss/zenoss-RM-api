@@ -5,7 +5,7 @@
 # JSON API and the ZenAPIConnector class written by #
 # Adam McCurdy @ Zenoss                             #
 #####################################################
-
+from __future__ import print_function
 import zenApiLib
 
 
@@ -15,8 +15,8 @@ def deviceIssuesReport():
     .csv format. There are several other fields one might be
     interested in here, but here are a few as an example.
     '''
-    print 'Device, Device Class, ProdState, Clear, Debug, Info '\
-          'Warning, Error, Critical'
+    print('Device, Device Class, ProdState, Clear, Debug, Info '\
+          'Warning, Error, Critical')
     dr = zenApiLib.zenConnector(routerName = 'DashboardRouter')
     report_data = dr.callMethod('getDeviceIssues')
     if report_data.get('result', {}).get('success', False) is False:
@@ -33,7 +33,7 @@ def deviceIssuesReport():
         warning = events['warning']['count']
         error = events['error']['count']
         critical = events['critical']['count']
-        print '%s, %s, %s, %s, %s, %s, %s, %s, %s' % (device,
+        print('%s, %s, %s, %s, %s, %s, %s, %s, %s' % (device,
                                                       deviceClass,
                                                       prodState,
                                                       clear,
@@ -41,7 +41,7 @@ def deviceIssuesReport():
                                                       info,
                                                       warning,
                                                       error,
-                                                      critical)
+                                                      critical))
 
 
 if __name__ == '__main__':

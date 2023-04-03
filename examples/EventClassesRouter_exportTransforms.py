@@ -1,4 +1,5 @@
 #!/bin/env python
+from __future__ import print_function
 import zenApiLib
 import sys
 import os
@@ -12,7 +13,7 @@ def getTransform(evtUid):
     '''
     rsp = api.callMethod('getTransform', uid=evtUid)
     if rsp.get('result', {}).get('success', False) == False:
-        print "ERROR"
+        print("ERROR")
         pprint(rsp)
         sys.exit(1)
     return  rsp.get('result', {}).get('data', 'Unknown')
@@ -23,7 +24,7 @@ def getMappings(evtUid):
     '''
     rsp = api.callMethod('getInstances', uid=evtUid)
     if rsp.get('result', {}).get('success', False) == False:
-        print "ERROR"
+        print("ERROR")
         pprint(rsp)
         sys.exit(1)
     return  rsp.get('result', {}).get('data', [])
@@ -72,15 +73,15 @@ def write2File(sType, sUid, sData):
         sUid,
         sType
     )
-    print "INFO: writing {}".format(
+    print("INFO: writing {}".format(
         sFilePath
-    )
+    ))
     try:
         oFile = open(sFilePath, 'w')
         oFile.write(sData)
         oFile.close()
     except Exception, e:
-        print "ERROR: %s" % (e)
+        print("ERROR: %s" % (e))
         sys.exit(1)
 
 

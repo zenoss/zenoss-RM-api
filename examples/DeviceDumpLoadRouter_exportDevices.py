@@ -1,12 +1,18 @@
-#!/bin/env python
+#!/usr/bin/env python
+
+from __future__ import print_function
 import zenApiLib
 import argparse
 import sys
 import logging
 import os
-from urlparse import urlparse
 from datetime import date
 from pprint import pformat
+
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 def buildArgs():
     parser = argparse.ArgumentParser(description='Poll & display API Router & '
@@ -61,7 +67,7 @@ if __name__ == '__main__':
         # ?Bug? (ZEN-31017) - work-around via multiple api calls
         # -- Get device classes first
         if args['exOrg']:
-            print >>rOut, "#### {} extract of classes ####".format(devClass)
+            print("#### {} extract of classes ####".format(devClass), file=rOut)
             apiResult = api.callMethod(
                 'exportDevices',
                 options={
@@ -74,13 +80,14 @@ if __name__ == '__main__':
                     devClass,
                     apiResult['result']['deviceCount']
                 ))
-                print >>rOut, apiResult['result']['data']
+                print(apiResult['result']['data'], file=rOut)
             else:
-                print >>sys.stderr, "ERROR: API results nonsuccessfull\n{}".format(
+                pass
+                print("ERROR: API results nonsuccessfull\n{}".format(
                     pformat(apiResult)
-                )
+                ), file=sys.stderr)
         if args['exDev']:
-            print >>rOut, "#### {} extract of devices ####".format(devClass)
+            print("#### {} extract of devices ####".format(devClass), file=rOut)
             # -- now devices, with its deviceClass defined in the moveDevice batchload parameter
             apiResult = api.callMethod(
                 'exportDevices',
@@ -94,8 +101,9 @@ if __name__ == '__main__':
                     devClass,
                     apiResult['result']['deviceCount']
                 ))
-                print >>rOut, apiResult['result']['data']
+                print(apiResult['result']['data'], file=rOut)
             else:
-                print >>sys.stderr, "ERROR: API results nonsuccessfull\n{}".format(
+                pass
+                print("ERROR: API results nonsuccessfull\n{}".format(
                     pformat(apiResult)
-                )
+                ), file=sys.stderr)

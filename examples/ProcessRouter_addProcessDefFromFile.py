@@ -11,6 +11,7 @@
 # a ProcessOrganizer path, which will be created and#
 # the ProcessClass will be placed in                #
 #####################################################
+from __future__ import print_function
 
 #########################
 # example text file

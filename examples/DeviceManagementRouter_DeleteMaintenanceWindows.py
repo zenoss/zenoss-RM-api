@@ -4,6 +4,7 @@
 # example of how to remove old maintenance windows from a      #
 # specific device                                              #
 ################################################################
+from __future__ import print_function
 import zenApiLib
 from time import time
 
@@ -21,4 +22,4 @@ for mwindow in response['result']['data']:
         time_to_delete = curr_time - 86400
         if mwindow['start'] < time_to_delete:
             del_resp = delete_maint_window(mwindow['uid'], mwindow['id'])
-            print del_resp
+            print(del_resp)

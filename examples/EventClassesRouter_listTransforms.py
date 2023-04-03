@@ -1,7 +1,7 @@
 #!/bin/env python
-
 # API version of script found at:
 # https://support.zenoss.com/hc/en-us/articles/202423289-How-To-List-All-Event-Transforms-and-Event-Class-Mappings
+from __future__ import print_function
 
 
 import zenApiLib
@@ -14,7 +14,7 @@ def getTransform(evtUid):
     '''
     rsp = api.callMethod('getTransform', uid=evtUid)
     if rsp.get('result', {}).get('success', False) == False:
-        print "ERROR"
+        print("ERROR")
         pprint(rsp)
         sys.exit(1)
     return  rsp.get('result', {}).get('data', 'Unknown')
@@ -25,7 +25,7 @@ def getMappings(evtUid):
     '''
     rsp = api.callMethod('getInstances', uid=evtUid)
     if rsp.get('result', {}).get('success', False) == False:
-        print "ERROR"
+        print("ERROR")
         pprint(rsp)
         sys.exit(1)
     return  rsp.get('result', {}).get('data', [])
@@ -40,8 +40,8 @@ def mappings(evtClsUid='/zport/dmd/Events'):
         if mapping.get('hasTransform', False):
             mappingPath = mapping.get('uid', 'Unknown').replace('/zport/dmd/', '').replace('/instances/', '/')
             label = '[Mapping] %s' % mappingPath
-            print '%s\n%s' % (label, '-' * len(label))
-            print getTransform(mapping['uid']), "\n"
+            print('%s\n%s' % (label, '-' * len(label)))
+            print(getTransform(mapping['uid']), "\n")
 
 def check4transform(evtCls):
     '''
@@ -49,8 +49,8 @@ def check4transform(evtCls):
     '''
     if evtCls.get("text", {}).get("hasTransform", False):
         label = '[Transform] %s' % evtCls['path']
-        print '%s\n%s' % (label, '-' * len(label))
-        print getTransform(evtCls['uid']), "\n"
+        print('%s\n%s' % (label, '-' * len(label)))
+        print(getTransform(evtCls['uid']), "\n")
 
 def eventClasses(evtClsUid):
     '''

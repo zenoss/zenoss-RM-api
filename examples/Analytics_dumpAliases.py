@@ -1,4 +1,5 @@
 #!/bin/env python
+from __future__ import print_function
 import zenApiLib
 import argparse
 import sys
@@ -64,7 +65,7 @@ def __printAliasLine(outputFile, path, dsName, dpName, alias, oid):
         writeStr = '%s # oid: %s' % ('|'.join(tokens), oid)
     else:
         writeStr = '%s' % ('|'.join(tokens))
-    print >>outputFile, writeStr
+    print(writeStr, file=outputFile)
 
 
 if __name__ == '__main__':
@@ -89,9 +90,9 @@ if __name__ == '__main__':
                                   id='/zport/dmd/Devices')
     seenTpls = []
     ALIASES = args['aliases']
-    print 'Writing all datapoints %s aliases to %s' % (ALIASES,
-                                                       args['outFileName'])
-    print >>ALIAS_FILE, '#template binding path|template|datasource|datapoint|alias|rpn'
+    print('Writing all datapoints %s aliases to %s' % (ALIASES,
+                                                       args['outFileName']))
+    print('#template binding path|template|datasource|datapoint|alias|rpn', file=ALIAS_FILE)
     for templ in getAllTemplates():
         path = templ['uid']
         # Skip template if we're already done it
@@ -123,5 +124,5 @@ if __name__ == '__main__':
             elif not dp['aliases']:
                 __printAliasLine(ALIAS_FILE, path, dsName, dpName, None, oid)
                     
-    print 'Finished. All datapoints %s aliases exported to %s' % (ALIASES,
-                                                                  args['outFileName'])
+    print('Finished. All datapoints %s aliases exported to %s' % (ALIASES,
+                                                                  args['outFileName']))

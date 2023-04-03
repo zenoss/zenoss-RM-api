@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+#####################################################
+# This script is a basic example of how to add a    #
+# device into Zenoss Resource Manager using the     #
+# Zenoss JSON API and the ZenAPIConnector class     #
+# written by Adam McCurdy @ Zenoss                  #
+#####################################################
+from __future__ import print_function
 import sys
 import zenApiLib
 
@@ -9,7 +16,7 @@ usage = '%s <device_id> <device_class_name> <productionState> <collector>' % (sy
 
 
 def fail():
-    print 'Invalid arguments. \nUsage: %s' % (usage)
+    print('Invalid arguments. \nUsage: %s' % (usage))
     sys.exit(1)
 
 
@@ -52,4 +59,4 @@ if __name__ == '__main__':
     '''
     data = buildArgs()
     api_response = addDevice(data)
-    print api_response
+    print(api_response)

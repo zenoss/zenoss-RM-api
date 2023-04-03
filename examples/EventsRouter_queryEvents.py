@@ -5,6 +5,7 @@
 # Zenoss JSON API and the ZenAPIConnector class     #
 # written by Adam McCurdy @ Zenoss                  #
 #####################################################
+from __future__ import print_function
 
 import zenApiLib
 import sys
@@ -278,5 +279,5 @@ if __name__ == '__main__':
     results = makeQuery(data, count)
 
     for result in results:
-        print(json.dumps(extractEvents(result)))
+        print((json.dumps(extractEvents(result))))
 

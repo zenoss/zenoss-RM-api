@@ -7,6 +7,7 @@
 #
 # To run type:
 #     python impact_api_copy_paste_policy_gates.py
+from __future__ import print_function
 
 
 from zenApiImpactRouterHelper import (
@@ -68,7 +69,7 @@ def setPolicies(copyPolicyData, serviceOrganizer, serviceName, contextUid, polic
     #       u'properties': {u'threshold': u'100'}}
 
     for policy in copyPolicyData:
-        print '\nSetting policy: %s' % policy
+        print('\nSetting policy: %s' % policy)
         api.set_policy(
             serviceUid=IMPACT_ROOT+serviceOrganizer+'/services'+serviceName,
             contextUid=contextUid, 
@@ -103,7 +104,7 @@ def copyPoliciesToServices():
         copyPolicies=getPolicies(copyFromOrganizer, copyFromService, contextUid, policyType)
     
         # Print the current policies for the current source and target services
-        print '\nCopied Policies from %s%s:' % (copyFromOrganizer, copyFromService)
+        print('\nCopied Policies from %s%s:' % (copyFromOrganizer, copyFromService))
         pprint(copyPolicies)
 
         #print '\nCurrent Policies on %s%s:' % (copyToOrganizer, copyToService)
@@ -113,7 +114,7 @@ def copyPoliciesToServices():
         setPolicies(copyPolicies['data'], copyToOrganizer, toService, contextUid, policyType)
 
         # print the target service's new policies for audit purposes
-        print '\nNew Policies on %s%s:' % (copyToOrganizer, toService)
+        print('\nNew Policies on %s%s:' % (copyToOrganizer, toService))
         pprint(getPolicies(copyToOrganizer, toService, contextUid, policyType))
 
 if __name__ == '__main__':

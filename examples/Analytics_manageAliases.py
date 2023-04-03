@@ -1,4 +1,5 @@
 #!/bin/env python
+from __future__ import print_function
 import zenApiLib
 import argparse
 import sys
@@ -82,9 +83,9 @@ if __name__ == '__main__':
         api.config['timeout'] = 30
 
     if args['commit']:
-        print "Commit turned on, changes will be commited via the API"
+        print("Commit turned on, changes will be commited via the API")
     else:
-        print "Dry run only - no changes will be commited. Reun with --commit after reviewing output."
+        print("Dry run only - no changes will be commited. Reun with --commit after reviewing output.")
 
     # now that we've validated args, open the aliases file and loop through it looking for specified aliases in dmd
     with open(args['inFileName']) as fp:
@@ -99,7 +100,7 @@ if __name__ == '__main__':
                 path, tplId, dsId, dpId, aliasId, rpnFormula = lineChunk.split('|')
             except ValueError:
                 # Malformed line
-                print ' X',line
+                print(' X',line)
                 continue
 
             # Do not need to get Template or DataSource Details...
@@ -134,10 +135,10 @@ if __name__ == '__main__':
                     formula = '' if formula is None else formula
                     if formula == rpnFormula:
                         # We found the alias, and the RPN matches, so log a match, nothing to do
-                        print '  ', line.rstrip()
+                        print('  ', line.rstrip())
                     else:
                         # We found the alias, but we need to update the RPN, so log an RPN update
-                        print 'R ', line.rstrip()
+                        print('R ', line.rstrip())
                         if args['commit']:
                             apiDPChg = api.callMethod('setInfo',
                                                uid = dsUid,
@@ -147,14 +148,14 @@ if __name__ == '__main__':
                                                          }]
                                                )
                             if not apiDPChg['result']['success']:
-                                print >>sys.stderr, "Formula change for alias '{}' was not successful. {}".format(
+                                print("Formula change for alias '{}' was not successful. {}".format(
                                     dsUid,
                                     pformat(apiDPChg)
-                                )
+                                ), file=sys.stderr)
                             sys.exit()
                 else:
                     # We didn't find the alias, so add it and the RPN, if any, and log an add
-                    print '+ ', line.rstrip()
+                    print('+ ', line.rstrip())
                     if args['commit']:
                         apiDPChg = api.callMethod('setInfo',
                                            uid = dsUid,
@@ -164,10 +165,10 @@ if __name__ == '__main__':
                                                      }]
                                            )
                         if not apiDPChg['result']['success']:
-                            print >>sys.stderr, "Formula change for alias '{}' was not successful. {}".format(
+                            print("Formula change for alias '{}' was not successful. {}".format(
                                 dsUid,
                                 pformat(apiDPChg)
-                            )
+                            ), file=sys.stderr)
             # If we're attempting to remove an alias...
             elif args['action'] == 'remove':
                 if alias:
@@ -177,20 +178,20 @@ if __name__ == '__main__':
                     formula = '' if formula is None else formula
                     if formula == rpnFormula:
                         # We found the RPN matches, so remove the alias and RPN and log a removal
-                        print '- ', line.rstrip()
+                        print('- ', line.rstrip())
                         #datapoint.removeAlias(aliasId)
                         if args['commit']:
                             apiDPChg = api.callMethod('setInfo',
                                                uid = dsUid,
                                                aliases = rmAlias)
                             if not apiDPChg['result']['success']:
-                                print >>sys.stderr, "Formula change for alias '{}' was not successful. {}".format(
+                                print("Formula change for alias '{}' was not successful. {}".format(
                                     dsUid,
                                     pformat(apiDPChg)
-                                )                        
+                                ), file=sys.stderr)                        
                     else:
                         # We RPN doesn't match so log the inability to remove the alias and RPN due to RPN mismatch
-                        print ' r', line.rstrip()
+                        print(' r', line.rstrip())
                 else:
                     # We couldn't find the alias, so log the inability to find the alias
-                    print ' a', line.rstrip()
+                    print(' a', line.rstrip())

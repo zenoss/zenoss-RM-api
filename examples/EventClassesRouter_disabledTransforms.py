@@ -1,4 +1,5 @@
 #!/bin/env python
+from __future__ import print_function
 
 import zenApiLib
 import sys
@@ -10,7 +11,7 @@ def transformEnabled(evtUid):
     '''
     rsp = api.callMethod('isTransformEnabled', uid=evtUid)
     if rsp.get('result', {}).get('success', False) == False:
-        print "ERROR"
+        print("ERROR")
         pprint(rsp)
         sys.exit(1)
     return  rsp.get('result', {}).get('data', 'Unknown')
@@ -21,7 +22,7 @@ def getMappings(evtUid):
     '''
     rsp = api.callMethod('getInstances', uid=evtUid)
     if rsp.get('result', {}).get('success', False) == False:
-        print "ERROR"
+        print("ERROR")
         pprint(rsp)
         sys.exit(1)
     return  rsp.get('result', {}).get('data', [])
@@ -36,7 +37,7 @@ def mappings(evtClsUid='/zport/dmd/Events'):
         if mapping.get('hasTransform', False):
             if not transformEnabled(mapping['uid']):
                 mappingPath = mapping.get('uid', 'Unknown').replace('/zport/dmd/', '').replace('/instances/', '/')
-                print 'Mapping {} transform DISABLED'.format(mappingPath)
+                print('Mapping {} transform DISABLED'.format(mappingPath))
 
 def check4transform(evtCls):
     '''
@@ -44,7 +45,7 @@ def check4transform(evtCls):
     '''
     if evtCls.get("text", {}).get("hasTransform", False):
         if not transformEnabled(evtCls['uid']):
-            print 'EventClass {} transform DISABLED'.format(evtCls['path'])
+            print('EventClass {} transform DISABLED'.format(evtCls['path']))
 
 def eventClasses(evtClsUid):
     '''

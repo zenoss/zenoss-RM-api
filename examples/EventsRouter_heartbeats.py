@@ -1,4 +1,5 @@
 #!/bin/env python
+from __future__ import print_function
 
 import zenApiLib
 import sys
@@ -25,7 +26,7 @@ def heartbeats(api):
            }
     rsp = api.callMethod('query', **data)
     if rsp.get('result', {}).get('success', False) == False:
-        print "ERROR"
+        print("ERROR")
         pprint(rsp)
         sys.exit(1)
     return rsp.get('result', {}).get('events', 'Unknown')

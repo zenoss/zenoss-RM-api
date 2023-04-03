@@ -5,6 +5,7 @@
 # using the Zenoss JSON API and the ZenAPIConnector #
 # class written by Adam McCurdy @ Zenoss            #
 #####################################################
+from __future__ import print_function
 
 import zenApiLib
 
@@ -32,14 +33,14 @@ def printProperties(response):
         isLocal = prop['islocal']
         value = prop['value']
         description = prop['description']
-        print '%s,,%s,,%s,,%s,,%s,,%s' % (id,
+        print('%s,,%s,,%s,,%s,,%s,,%s' % (id,
                                           category,
                                           label,
                                           isLocal,
                                           value,
-                                          description)
+                                          description))
 
 if __name__ == '__main__':
     response = getProperties()
-    print 'ID,,Category,,Label,,IsLocal?,,Value,,Description'
+    print('ID,,Category,,Label,,IsLocal?,,Value,,Description')
     printProperties(response)

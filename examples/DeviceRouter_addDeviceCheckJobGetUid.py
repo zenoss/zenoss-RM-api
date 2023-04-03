@@ -6,6 +6,7 @@
 # Zenoss JSON API and the ZenAPIConnector class     #
 # written by Adam McCurdy @ Zenoss                  #
 #####################################################
+from __future__ import print_function
 
 import sys
 import zenApiLib
@@ -20,7 +21,7 @@ usage = '%s <device_id> <device_class_name> <productionState>' % (sys.argv[0])
 
 
 def fail():
-    print 'Invalid arguments. \nUsage: %s' % (usage)
+    print('Invalid arguments. \nUsage: %s' % (usage))
     sys.exit(1)
 
 
@@ -61,8 +62,8 @@ if __name__ == '__main__':
     '''
     data = buildArgs()
     api_response = addDevice(data)
-    print 'Created job %s... watching job status' % (api_response)
+    print('Created job %s... watching job status' % (api_response))
     jobstatus = watchStatus(api_response, 300)
-    print 'Job status %s, Success: %s' % (jobstatus[0], jobstatus[1])
+    print('Job status %s, Success: %s' % (jobstatus[0], jobstatus[1]))
     devfind = ZenDeviceUidFinder(sys.argv[1])
-    print 'Device UID is %s' % (devfind.first())
+    print('Device UID is %s' % (devfind.first()))

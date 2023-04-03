@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import zenApiLib
 import time
 import sys
@@ -6,7 +7,7 @@ import sys
 usage = '%s <uid> <durationHours> <prodState> <name>' % (sys.argv[0])
 
 if len(sys.argv) != 5:
-    print usage
+    print(usage)
     sys.exit(1)
 else:
     uid = sys.argv[1]

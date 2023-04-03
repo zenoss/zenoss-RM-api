@@ -5,6 +5,7 @@
 # using the Zenoss JSON API and the ZenAPIConnector #
 # class written by Adam McCurdy @ Zenoss            #
 #####################################################
+from __future__ import print_function
 
 import zenApiLib
 
@@ -19,7 +20,7 @@ def deviceReport():
     .csv format. There are numerous other fields that can
     be displayed here, but here are a few as an example.
     '''
-    print 'Name, IP Address, UID, ProdState, Collector, Location'
+    print('Name, IP Address, UID, ProdState, Collector, Location')
     dr = zenApiLib.zenConnector(routerName = router)
     for device_resp in dr.pagingMethodCall(method, **data):
         if device_resp.get('result', {}).get('success', False) is False:
@@ -29,12 +30,12 @@ def deviceReport():
                 location = dev['location']['uid']
             except (KeyError, TypeError):
                 location = ''
-            print '%s, %s, %s, %s, %s, %s' % (dev['name'],
+            print('%s, %s, %s, %s, %s, %s' % (dev['name'],
                                               dev['ipAddressString'],
                                               dev['uid'],
                                               dev['productionState'],
                                               dev['collector'],
-                                              location)
+                                              location))
 
 
 if __name__ == '__main__':

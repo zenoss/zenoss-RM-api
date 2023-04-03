@@ -83,7 +83,7 @@ class ZenAPIConnector_v1():
         if response.status_code == 200:
             return response
         else:
-            print 'HTTP Status: %s' % (response.status_code)
+            print('HTTP Status: %s' % (response.status_code))
 
 
 class ZenDeviceUuidFinder():

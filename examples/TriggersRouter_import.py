@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 
 # stdlib Imports
 import json
@@ -26,10 +27,10 @@ def TriggerRouter(sMethod, dData={}):
     zenAPI.setRouter('TriggersRouter')
     respData = zenAPI.callMethod(sMethod, **dData)
     if not respData['result']['success']:
-        print "ERROR: TriggerRouter %s method call non-successful" % sMethod
-        print respData
-        print "Data submitted was:"
-        print response.request.body
+        print("ERROR: TriggerRouter %s method call non-successful" % sMethod)
+        print(respData)
+        print("Data submitted was:")
+        print(response.request.body)
         exit(1)
     return respData['result']['data']
 
@@ -61,7 +62,7 @@ def getNameIdx(type):
         # getting an index for windows is more invovled
         return _getWindowNameIdx()
     elif not (type in dTypeId.keys()):
-        print "ERROR: Caching %s Name-ID index: no such type" % type
+        print("ERROR: Caching %s Name-ID index: no such type" % type)
         return {}
     log.debug("Caching Index for %ss" % type)
     lResult = TriggerRouter(dTypeId[type]['apiTriggerRouter'])
@@ -95,7 +96,7 @@ def _getWindowNameIdx():
 
 def getConfigOrCreate(type, data):
     if not (type in "trigger, notification, window"):
-        print "ERROR: %s creation: no such type" % type
+        print("ERROR: %s creation: no such type" % type)
         return {}
     if ((
             type == 'trigger' and
@@ -170,9 +171,9 @@ def _getConfig(type, data, warn=False):
                 dConfig = dNotif
                 break
         if dConfig == {}:
-            print "ERROR: Did not find notification config for %s" % (
+            print("ERROR: Did not find notification config for %s" % (
                 data['name']
-            )
+            ))
     elif type == 'window':
         # Windows API calls require Notification uid
         # sNotifUid=_getWindowNotifUid(data['uid'])
@@ -314,7 +315,7 @@ if __name__ == "__main__":
     argv.pop(0)
     for sFileName in argv:
         if not os.path.isfile(sFileName):
-            print "ERROR: %s does not exist, ignoring" % sFileName
+            print("ERROR: %s does not exist, ignoring" % sFileName)
             continue
         log.info("Reading file %s" % sFileName)
         oFile = open(sFileName, 'r')
@@ -356,7 +357,7 @@ if __name__ == "__main__":
             if dWinsIndex == {}:
                 dWinsIndex = getNameIdx(type)
         else:
-            print "ERROR: unknown type"
+            print("ERROR: unknown type")
             exit(1)
         # Create Notification
         dZenConfig = getConfigOrCreate(type, dImportData)

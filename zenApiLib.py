@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 import os
-import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.packages.urllib3.util.retry import Retry
-from httplib import HTTPConnection
-from requests.adapters import HTTPAdapter
 import json
-import ConfigParser
-from HTMLParser import HTMLParser
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+# Try to import from python 2 locations, fallback to python3.
+try:
+    from httplib import HTTPConnection
+    from HTMLParser import HTMLParser
+    import ConfigParser
+except ImportError:
+    from http.client import HTTPConnection
+    from html.parser import HTMLParser
+    import configparser as ConfigParser
+
 
 if not ('logging' in dir()):
     import logging
@@ -78,7 +86,7 @@ class zenConnector():
         if 'cz' in configuration:
             if not 'apikey' in configuration:
                 raise Exception('Configuration file missing "apikey" key')
-            configuration['url'] = configuration['url'] + '/' + configuration['cz']
+            configuration['url'] = '{}/{}'.format(configuration['url'], configuration['cz'])
         elif 'username' in configuration:
             if not 'password' in configuration:
                 self.log.error('Configuration file missing "password" key')
@@ -282,10 +290,9 @@ class zenConnector():
         # To query if specified router exists, first need to query all available routers.
         # Temporarily setting to 'IntrospectionRouter' in order to do so.
         self._routerName = 'IntrospectionRouter'
+        self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter')
         if self.config['disable_saml'] == True:
-            self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter') + '?saml=0'
-        else:
-            self._url = self.config['url'] + self._getEndpoint('IntrospectionRouter')
+            self._url +='?saml=0'
         # Query all available routers
         if self._routersInfo == {}:
             apiResp = self.callMethod('getAllRouters')
@@ -317,10 +324,9 @@ class zenConnector():
             self._routersInfo[routerName]['methods'] = dict(apiResp['result']['data'])
         # Set router
         self._routerName = routerName
+        self._url = self.config['url'] + self._getEndpoint(routerName)
         if self.config['disable_saml'] == True:
-            self._url = self.config['url'] + self._getEndpoint(routerName) + '?saml=0'
-        else: 
-            self._url = self.config['url'] + self._getEndpoint(routerName)
+            self._url +='?saml=0'
        
 
     def _getEndpoint(self, routerName):
@@ -348,7 +354,7 @@ class ZenAPIConnector(zenConnector):
         self._tid = 0
         self.log = logging.getLogger('zenApiLib.ZenAPIConnector')
         self.log.warn('This is a backwards compatibility adapter.')
-        print "WARN: This is a backwards compatibility adapter."
+        print("WARN: This is a backwards compatibility adapter.")
         self.config = self._getConfigDetails('default', '')
         self.requestSession = self.getRequestSession()
         self.setRouter(router)
@@ -382,6 +388,6 @@ class TitleParser(HTMLParser):
 
 
 if __name__ == '__main__':
-    print "For help reference the README.md file"
-    print "If you are trying to make a command line call to the API, all command line invocations functions have been moved to zenApiCli.py"
+    print("For help reference the README.md file")
+    print("If you are trying to make a command line call to the API, all command line invocations functions have been moved to zenApiCli.py")
     
