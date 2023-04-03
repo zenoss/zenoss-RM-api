@@ -225,10 +225,14 @@ class zenConnector():
                 limitApiCallResults))
             rJson = self.callMethod(method[0], **payload)
             # Increment Page from fields in the results
-            if not ('totalCount' in rJson['result']):
-                apiResultsTotal = -1
-            else:
+            if 'totalCount' in rJson['result']: 
                 apiResultsTotal = rJson['result']['totalCount']
+            elif 'total' in rJson['result']:
+                apiResultsTotal = rJson['result']['total']
+            else:
+                apiResultsTotal = -1
+
+            if apiResultsTotal != -1:
                 if 'start' in payload:
                     apiResultsReturned = payload['start'] + limitApiCallResults
                     payload['start'] += limitApiCallResults

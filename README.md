@@ -24,7 +24,7 @@ This repository is a fork of https://github.com/amccurdy/zenoss_api and currentl
 - 'zenApiCli.py' script available. For simple, command line API interaction. Can be easily incorporated with existing shell scripts.
 
 ## Pre-requisites:
-This python library depends on the following: requests, pyOpenSSL, ndg-httpsclient, pyasn1
+This python library depends on the following: Python 2.7, requests, pyOpenSSL, ndg-httpsclient, pyasn1
 
 You can install those quickly with pip:
 ```
