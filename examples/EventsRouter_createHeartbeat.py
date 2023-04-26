@@ -5,17 +5,17 @@ import zenApiLib
 import sys
 from pprint import pprint
 
+
 def heartbeats(api):
     data = {
                 'summary': 'Hearbeat',
-                'device': 'bryantest',
+                'device': 'mydevicename',
                 'component': '',
                 'severity': 5,
                 'evclass': '/Heartbeat',
-                'evclasskey': 'none',
+                'evclasskey': '',
                 'message': 'test',
-                'monitor': 'AustinCollectorPool',
-                'timeout': 120
+                'timeout': 300   #time in seconds before creating the heartbeat event
            }
     rsp = api.callMethod('add_event', **data)
     if rsp.get('result', {}).get('success', False) == False:
