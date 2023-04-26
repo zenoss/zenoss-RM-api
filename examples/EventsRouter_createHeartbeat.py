@@ -1,4 +1,8 @@
 #!/bin/env python
+
+# Create heartbeat events based on kb Article
+# https://support.zenoss.com/hc/en-us/articles/203048445-How-To-Send-Heartbeat-Events-From-Applications
+
 from __future__ import print_function
 
 import zenApiLib
