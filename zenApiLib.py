@@ -5,6 +5,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+import time
 
 # Try to import from python 2 locations, fallback to python3.
 try:
@@ -23,6 +24,9 @@ if not ('logging' in dir()):
         format = '%(asctime)s %(levelname)s %(name)s: %(message)s'
     )
     logging.getLogger().setLevel(logging.ERROR)
+
+class SetRouterFailure(Exception):
+    pass
 
 
 class zenConnector():
@@ -44,7 +48,6 @@ class zenConnector():
             self.setRouter('IntrospectionRouter')
         else:
             self.setRouter(routerName)
-       
 
     def _getConfigDetails(self, section, cfgFilePath):
         '''
@@ -72,7 +75,6 @@ class zenConnector():
         configuration = {item[0]: item[1] for item in configurations.items(section)}
         configuration = self._sanitizeConfig(configuration)
         return configuration
-
 
     def _sanitizeConfig(self, configuration):
         '''
@@ -114,7 +116,6 @@ class zenConnector():
         configuration['disable_saml'] = disableSaml
         return configuration
 
-
     def getRequestSession(self):
         '''
         Setup defaults for using the requests library 
@@ -133,7 +134,6 @@ class zenConnector():
             HTTPAdapter(max_retries=retries)
         )
         return s
-
 
     def callMethod(self, *method, **payload):
         '''
@@ -198,7 +198,6 @@ class zenConnector():
         else:
             return self._validateRawResponse(r)
 
-
     def pagingMethodCall(self, *method, **payload):
         '''
         Returns an iterative, generator type object of API call results.
@@ -241,7 +240,6 @@ class zenConnector():
                     payload['start'] = limitApiCallResults
             yield rJson
 
-
     def _validateRawResponse(self, r):
         '''
         todo
@@ -279,8 +277,20 @@ class zenConnector():
                 apiResultsTotal = -1
         return rJson
 
-
     def setRouter(self, routerName):
+        setRouterTryCount = 0
+        while setRouterTryCount < self.config['retries']:
+            try:
+                self._setRouter(routerName)
+            except SetRouterFailure as ex:
+                self.log.warn('SetRouter failed: %r', ex)
+                setRouterTryCount += 1
+                time.sleep(2 * 2)
+            else:
+                # no retry needed
+                break
+                
+    def _setRouter(self, routerName):
         '''
         Set object to specific API router.
         Basic error checking that specified router actually exisits.
@@ -297,10 +307,10 @@ class zenConnector():
         if self._routersInfo == {}:
             apiResp = self.callMethod('getAllRouters')
             if not apiResp['result']['success']:
-                raise Exception('getAllRouters call was not sucessful')
+                raise SetRouterFailure('getAllRouters call was not sucessful')
 
             if not len(apiResp['result']['data']) > 0:
-                raise Exception('getAllRouters call did not return any results')
+                raise SetRouterFailure('getAllRouters call did not return any results')
             
             for resp in apiResp['result']['data']:
                 routerKey = resp.get('action', 'unknown')
@@ -317,17 +327,16 @@ class zenConnector():
         if self._routersInfo[routerName]['methods'] == {}:
             apiResp = self.callMethod('getRouterMethods', router = routerName)
             if not apiResp['result']['success']:
-                raise Exception('getRouterMethods call was not sucessful')
+                raise SetRouterFailure('getRouterMethods call was not sucessful')
             else:
                 if not len(apiResp['result']['data']) > 0:
-                    raise Exception('getRouterMethods call did not return any resilts')
+                    raise SetRouterFailure('getRouterMethods call did not return any resilts')
             self._routersInfo[routerName]['methods'] = dict(apiResp['result']['data'])
         # Set router
         self._routerName = routerName
         self._url = self.config['url'] + self._getEndpoint(routerName)
         if self.config['disable_saml'] == True:
             self._url +='?saml=0'
-       
 
     def _getEndpoint(self, routerName):
         '''
