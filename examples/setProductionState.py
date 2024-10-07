@@ -14,7 +14,7 @@ from zenApiDeviceRouterHelper import ZenDeviceUidFinder
 router = 'DeviceRouter'
 method = 'setProductionState'
 
-usage = '%s <device_id> <device_class_name>' % (sys.argv[0])
+usage = '%s <device_id> <production_state_numeric_value>' % (sys.argv[0])
 
 
 def fail():
