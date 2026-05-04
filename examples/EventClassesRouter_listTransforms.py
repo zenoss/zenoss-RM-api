@@ -1,7 +1,8 @@
-#!/bin/env python
+#!/usr/bin/env python
+from __future__ import print_function
 # API version of script found at:
 # https://support.zenoss.com/hc/en-us/articles/202423289-How-To-List-All-Event-Transforms-and-Event-Class-Mappings
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 
 import zenApiLib

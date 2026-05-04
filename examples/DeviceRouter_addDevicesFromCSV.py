@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from __future__ import absolute_import, print_function
 #################################################
 # This script was written as a proof of concept #
 # for adding devices to a system from a csv file#
@@ -27,4 +29,4 @@ for line in clean_csv:
     dev_class = split_csv[1].strip()
     prod_state = split_csv[2].strip()
     response = dr.callMethod('addDevice', deviceName=dev_name, deviceClass=dev_class, productionState=prod_state)
-    print response
+    print(response)

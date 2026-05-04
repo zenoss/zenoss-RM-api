@@ -1,18 +1,26 @@
 #!/usr/bin/env python
+"""
+ZenAPIConnector - Legacy Zenoss API connector classes.
+Compatible with Python 2.7 and Python 3.6+
+"""
+from __future__ import print_function, absolute_import
+
 import requests
 from time import time, sleep
 from json import dumps
-from ConfigParser import RawConfigParser
-from RouterEndpointMap import RouterEndpointMap
 
+import six
+from six.moves.configparser import RawConfigParser
+
+from RouterEndpointMap import RouterEndpointMap
 from zenApiLib import ZenAPIConnector
 
-class ZenAPIConfig():
+
+class ZenAPIConfig(object):
     '''
     This class reads a file called 'creds.cfg' and generates a config that
     is then used to connect to the Zenoss API. See the sample creds.cfg
-    file in the repo @ https://github.com/amccurdy/zenoss_api for more
-    information.
+    file in the repo for more information.
     '''
     def __init__(self):
         self.config = RawConfigParser()
@@ -33,25 +41,23 @@ class ZenAPIConfig():
         return self.password
 
     def getSSLVerify(self):
-        if self.ssl_verify == None:
+        if self.ssl_verify is None:
             return False
-        try: 
+        try:
             if self.ssl_verify.lower() == 'true':
                 return True
             elif self.ssl_verify.lower() == 'false':
                 return False
             else:
-                # default to True if they set anything other than "true" or "false"
                 return True
         except AttributeError:
-            # TODO: add exception handling if something other than a string exists here
             raise
 
     def getRouterEndpoint(self, router_name):
         return self.router_endpoints.getEndpoint(router_name)
 
 
-class ZenAPIConnector_v1():
+class ZenAPIConnector_v1(object):
     '''
     This class is instantiated with a router, method, and a data
     dictionary. The router endpoint URL is pulled from the
@@ -69,24 +75,28 @@ class ZenAPIConnector_v1():
         self.headers = {'Content-Type': 'application/json'}
         self.ssl_verify = self.config.getSSLVerify()
         self.data = data
-        self.payload = dumps({'action': self.router,
-                              'method': self.method,
-                              'data': [data],
-                              'tid': 1})
+        self.payload = dumps({
+            'action': self.router,
+            'method': self.method,
+            'data': [data],
+            'tid': 1,
+        })
 
     def send(self):
-        response = requests.post(self.api_endpoint,
-                                 self.payload,
-                                 headers=self.headers,
-                                 auth=(self.username, self.password),
-                                 verify=self.ssl_verify)
+        response = requests.post(
+            self.api_endpoint,
+            self.payload,
+            headers=self.headers,
+            auth=(self.username, self.password),
+            verify=self.ssl_verify,
+        )
         if response.status_code == 200:
             return response
         else:
-            print('HTTP Status: %s' % (response.status_code))
+            print('HTTP Status: %s' % response.status_code)
 
 
-class ZenDeviceUuidFinder():
+class ZenDeviceUuidFinder(object):
     '''
     This class returns the name and UUID of a device when
     provided a query
@@ -97,9 +107,7 @@ class ZenDeviceUuidFinder():
         self.query = query
         self.uuid = None
         self.data = {'query': self.query}
-        self.api_call = ZenAPIConnector(self.router,
-                                        self.method,
-                                        self.data)
+        self.api_call = ZenAPIConnector(self.router, self.method, self.data)
         self.response = self.api_call.send()
         self.response_json = self.response.json()
         self.count = len(self.response_json['result']['data'])
@@ -123,7 +131,7 @@ class ZenDeviceUuidFinder():
         return self.getFirstUuid()
 
 
-class ZenDeviceUidFinder():
+class ZenDeviceUidFinder(object):
     '''
     This class returns the name and UID (path) of a device when
     provided a query
@@ -137,9 +145,7 @@ class ZenDeviceUidFinder():
         if ip is not None:
             self.params['ipAddress'] = ip
         self.data = {'params': self.params}
-        self.api_call = ZenAPIConnector(self.router,
-                                        self.method,
-                                        self.data)
+        self.api_call = ZenAPIConnector(self.router, self.method, self.data)
         self.response = self.api_call.send()
         self.response_json = self.response.json()
         self.count = len(self.response_json['result']['devices'])
@@ -163,7 +169,7 @@ class ZenDeviceUidFinder():
         return self.getFirstUid()
 
 
-class ZenJobsWatcher():
+class ZenJobsWatcher(object):
     '''
     This class is instantiated with a job id. Its primary purpose
     is to allow a user to perform a set of tasks that may require
@@ -201,11 +207,7 @@ class ZenJobsWatcher():
             elif self.success == 'ABORTED':
                 break
             sleep(3)
-        if self.success == 'FAILURE':
-            return self.success, False
-        elif self.success == 'ABORTED':
-            return self.success, False
-        elif self.success == 'TIMEOUT':
+        if self.success in ('FAILURE', 'ABORTED', 'TIMEOUT'):
             return self.success, False
         elif self.success == 'SUCCESS':
             return self.success, True

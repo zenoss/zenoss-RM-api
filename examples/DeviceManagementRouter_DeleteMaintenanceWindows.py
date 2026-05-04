@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+from __future__ import print_function
 ################################################################
 # This was written by Adam McCurdy during GalaxZ18 as an       #
 # example of how to remove old maintenance windows from a      #
 # specific device                                              #
 ################################################################
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 import zenApiLib
 from time import time
 

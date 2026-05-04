@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 # stdlib Imports
 import json
 from sys import exit, argv
 import os
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 import logging
 import zenApiLib
 
@@ -285,11 +286,11 @@ def diffData(type, data):
     dConfig = _getConfig(type, data)
     for key in dConfig.keys():
         if not (key in data):
-            log.warn("Compare fail:\n  importNoKey: %s\n  zenoss conf: %s:%s" % (key, key, dConfig[key]))
+            log.warning("Compare fail:\n  importNoKey: %s\n  zenoss conf: %s:%s" % (key, key, dConfig[key]))
         elif not (key in dConfig):
-            log.warn("Compare fail:\n  import file: %s:%s\n  zenossNoKey: %s" % (key, (key in data),key))
+            log.warning("Compare fail:\n  import file: %s:%s\n  zenossNoKey: %s" % (key, (key in data),key))
         elif data[key] != dConfig[key]:
-            log.warn("Compare fail:\n  import file: %s:%s\n  zenoss conf: %s:%s" % (key, data[key], key, dConfig[key]))
+            log.warning("Compare fail:\n  import file: %s:%s\n  zenoss conf: %s:%s" % (key, data[key], key, dConfig[key]))
 
             
 def log2stdout(loglevel):

@@ -1,6 +1,7 @@
-#!/bin/env python
-# Re id a device
+#!/usr/bin/env python
 from __future__ import print_function
+# Re id a device
+from __future__ import absolute_import, print_function
 import zenApiLib
 from zenApiDeviceRouterHelper import ZenDeviceUidFinder
 from zenApiJobsRouterHelper import watchStatus
@@ -50,10 +51,10 @@ if __name__ == '__main__':
                         loglevel=args['loglevel'])
     api.setRouter('DeviceRouter')
     if args['dontMoveGraphData']:
-	retainData = False
+        retainData = False
     else:
         retainData = True
-	
+    
     # Rename specified device
     deviceName = args['deviceName']
     newDeviceName = args['newDeviceName']

@@ -1,11 +1,12 @@
-#!/bin/env python
+#!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import, print_function
 import zenApiLib
 import argparse
 import sys
 import logging
 import os
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 from datetime import date
 from pprint import pformat
 

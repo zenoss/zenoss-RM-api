@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from __future__ import absolute_import, print_function
 import zenApiLib
 import argparse
 import json
 
 
-class ComponentGroups():
+class ComponentGroups(object):
     """ComponentGroupRouter base class."""
 
     def __init__(self):

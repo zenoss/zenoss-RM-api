@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to add a    #
 # device into Zenoss Resource Manager using the     #
@@ -16,7 +18,7 @@ usage = '%s <device_id> <device_class_name> <productionState>' % (sys.argv[0])
 
 
 def fail():
-    print 'Invalid arguments. \nUsage: %s' % (usage)
+    print('Invalid arguments. \nUsage: %s' % (usage))
     sys.exit(1)
 
 
@@ -53,4 +55,4 @@ if __name__ == '__main__':
     '''
     data = buildArgs()
     api_response = addDevice(data)
-    print api_response
+    print(api_response)

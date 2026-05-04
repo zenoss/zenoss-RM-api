@@ -1,6 +1,7 @@
-#!/bin/env python
-# Enable or disable a threshold
+#!/usr/bin/env python
 from __future__ import print_function
+# Enable or disable a threshold
+from __future__ import absolute_import, print_function
 import zenApiLib
 import argparse
 import sys

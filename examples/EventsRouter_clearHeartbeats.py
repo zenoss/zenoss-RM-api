@@ -1,6 +1,7 @@
-#!/bin/env python
-# Clear Heartbeats
+#!/usr/bin/env python
 from __future__ import print_function
+# Clear Heartbeats
+from __future__ import absolute_import, print_function
 import zenApiLib
 import argparse
 import sys

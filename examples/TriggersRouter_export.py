@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 # stdlib Imports
 import json
 from sys import exit
 import os
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 import zenApiLib
 
 zenAPI = zenApiLib.zenConnector(section = 'default')
@@ -43,7 +44,7 @@ def write2File(sType, lData):
             )
             trigFile.write(json.dumps(dEntry))
             trigFile.close()
-        except Exception, e:
+        except Exception as e:
             print("ERROR: %s" % (e))
             exit(1)
 

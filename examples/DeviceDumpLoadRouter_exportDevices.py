@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-
 from __future__ import print_function
+
+from __future__ import absolute_import, print_function
 import zenApiLib
 import argparse
 import sys
@@ -9,10 +10,7 @@ import os
 from datetime import date
 from pprint import pformat
 
-try:
-    from urlparse import urlparse
-except ImportError:
-    from urllib.parse import urlparse
+from six.moves.urllib.parse import urlparse
 
 def buildArgs():
     parser = argparse.ArgumentParser(description='Poll & display API Router & '

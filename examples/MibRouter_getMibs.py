@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to create a #
 # list of mibs and display mib-related info   #
@@ -40,12 +42,11 @@ def mibReport():
     for mib in mibs[0]['children']:
         try:
             if int(mib['text']['count']) > 0:
-                print '%s' % mib['path']
+                print('%s' % mib['path'])
         except:
-            print '%s' % mib['uid']
-
+            print('%s' % mib['uid'])
         for child in mib['children']:
-            print"  %s" % child['uid']
+            print("  %s") % child['uid']
 
 if __name__ == '__main__':
     mibReport()
