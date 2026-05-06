@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 #
 # Zenoss JSON API example to interact with Impact
 #
@@ -8,7 +8,6 @@ from __future__ import print_function
 #
 # To run type:
 #     python impact_api_copy_paste_policy_gates.py
-from __future__ import absolute_import, print_function
 
 
 from zenApiImpactRouterHelper import (

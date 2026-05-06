@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from __future__ import print_function
-# Re id a device
 from __future__ import absolute_import, print_function
+# Re id a device
 import zenApiLib
 from zenApiDeviceRouterHelper import ZenDeviceUidFinder
 from zenApiJobsRouterHelper import watchStatus

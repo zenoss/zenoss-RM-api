@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to bulk   #
 # modify monitoring templates          #
@@ -7,7 +7,6 @@ from __future__ import print_function
 # In this example we throw in a new script into the
 # datasource.  This is a pretty quick and dirty method #
 #####################################################
-from __future__ import absolute_import, print_function
 
 # stdlib Imports
 import json

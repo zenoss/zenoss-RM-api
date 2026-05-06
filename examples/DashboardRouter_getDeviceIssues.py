@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to create   #
 # display dashboard information using the Zenoss    #
 # JSON API and the ZenAPIConnector class written by #
 # Adam McCurdy @ Zenoss                             #
 #####################################################
-from __future__ import absolute_import, print_function
 import zenApiLib
 
 

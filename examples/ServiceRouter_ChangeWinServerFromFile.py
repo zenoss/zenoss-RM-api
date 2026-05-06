@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to change   #
 # attributes of a Windows Service Definition        #
@@ -8,7 +8,6 @@ from __future__ import print_function
 # line contains a new process.  This was done so    #
 # the script could be re-used without modifying it  #
 #####################################################
-from __future__ import absolute_import, print_function
 
 # stdlib Imports
 import json

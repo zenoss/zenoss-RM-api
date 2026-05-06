@@ -1,9 +1,8 @@
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 ################################################################
 # This is an example of using Flask to create an external,     #
 # api-driven dashboard using zenApiLib.                        #
 ################################################################
-from __future__ import absolute_import, print_function
 
 from flask import Flask
 import zenApiLib

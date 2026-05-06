@@ -175,6 +175,7 @@ class zenConnector(object):
         except Exception as e:
             msg = 'Requests exception: %s' % e
             self.log.error(msg)
+            self.apiResultsTotal = -1
             return {'result': {'success': False}, 'msg': msg}
         if self._apiResultsRaw:
             return r
@@ -224,6 +225,7 @@ class zenConnector(object):
         if r.status_code != 200:
             self.log.error("API call returned a '%s' http status." % r.status_code)
             self.log.debug("API EndPoint response: %s\n%s", r.reason, r.text)
+            self.apiResultsTotal = -1
             return {'result': {'success': False}}
         if 'Content-Type' in r.headers:
             if 'application/json' in r.headers['Content-Type']:
@@ -236,16 +238,19 @@ class zenConnector(object):
                 msg = "HTML response from API call. HTML page title: '%s'" % parser.title
                 self.log.error(msg)
                 self.log.debug("API EndPoint response: %s\n%s", r.reason, r.text)
+                self.apiResultsTotal = -1
                 return {'result': {'success': False}, 'msg': msg}
             else:
                 msg = "Unknown 'Content-Type' response header returned: '%s'" % r.headers['Content-Type']
                 self.log.error(msg)
                 self.log.debug("API EndPoint response: %s\n%s", r.reason, r.text)
+                self.apiResultsTotal = -1
                 return {'result': {'success': False}, 'msg': msg}
         else:
             msg = "Missing 'Content-Type' in API response's header"
             self.log.error(msg)
             self.log.debug("API EndPoint response: %s\n%s", r.reason, r.text)
+            self.apiResultsTotal = -1
             return {'result': {'success': False}, 'msg': msg}
 
     def setRouter(self, routerName):

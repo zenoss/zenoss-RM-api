@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to add an   #
 # OS Process Definition into Zenoss Resource Manager#
@@ -12,7 +12,6 @@ from __future__ import print_function
 # a ProcessOrganizer path, which will be created and#
 # the ProcessClass will be placed in                #
 #####################################################
-from __future__ import absolute_import, print_function
 
 #########################
 # example text file

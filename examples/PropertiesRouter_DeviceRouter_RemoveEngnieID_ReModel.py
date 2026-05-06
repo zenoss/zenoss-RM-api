@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 ################################################################
 # This was written by Adam McCurdy during GalaxZ18 as an       #
 # example of how to remove a local zProperty (zSnmpEngineId)   #
 # and re-model a device to handle a specific customer          #
 # use-case.                                                    #
 ################################################################
-from __future__ import absolute_import, print_function
 import sys
 import zenApiLib
 from zenApiDeviceRouterHelper import ZenDeviceUidFinder
