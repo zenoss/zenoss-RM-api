@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to add a    #
 # location into Zenoss Resource Manager using the   #
@@ -16,7 +17,7 @@ usage = '%s <new_node>'  % (sys.argv[0])
 
 
 def fail():
-    print 'Invalid arguments. \nUsage: %s' % (usage)
+    print('Invalid arguments. \nUsage: %s' % (usage))
     sys.exit(1)
 
 
@@ -67,8 +68,7 @@ def recursePath(data):
                 'type': 'organizer',
                 'contextUid': contextUid}
         api_response = addNode(data) 
-        print api_response
-
+        print(api_response)
 if __name__ == '__main__':
     '''
     Build the args and make the API call to add the device
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     if 'KeyError' in api_response['msg']:
         try:
             recursePath(sys.argv[1])
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
     else:
-        print api_response
+        print(api_response)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to add an   #
 # OS Process Definition into Zenoss Resource Manager#
@@ -11,7 +12,6 @@
 # a ProcessOrganizer path, which will be created and#
 # the ProcessClass will be placed in                #
 #####################################################
-from __future__ import print_function
 
 #########################
 # example text file
@@ -27,7 +27,7 @@ mySuite/anotherapp suiteProc
 import json
 from sys import exit
 import os
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 import zenApiLib
 
 PROCESS_ROOT= '/zport/dmd/Processes'

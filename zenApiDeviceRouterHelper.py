@@ -1,16 +1,23 @@
-from zenApiLib import ZenAPIConnector
-import zenApiLib
+#!/usr/bin/env python
+"""
+zenApiDeviceRouterHelper - Convenience helpers for the Zenoss DeviceRouter API.
+Compatible with Python 2.7 and Python 3.6+
+"""
+from __future__ import print_function, absolute_import
 
+import logging
+
+import zenApiLib
 
 if not ('logging' in dir()):
     import logging
     logging.basicConfig(
-        format = '%(asctime)s %(levelname)s %(name)s: %(message)s'
+        format='%(asctime)s %(levelname)s %(name)s: %(message)s'
     )
     logging.getLogger().setLevel(logging.ERROR)
 
 
-class ZenDeviceUuidFinder():
+class ZenDeviceUuidFinder(object):
     '''
     This class returns the name and UUID of a device when
     provided a query
@@ -19,14 +26,14 @@ class ZenDeviceUuidFinder():
         self.uuid = None
         self.results = []
         self.log = logging.getLogger('zenApiDeviceRouterHelper.ZenDeviceUuidFinder')
-        deviceAPI = zenApiLib.zenConnector(routerName = 'DeviceRouter')
-        apiResults = deviceAPI.callMethod('getDeviceUuidsByName', query = query)
+        deviceAPI = zenApiLib.zenConnector(routerName='DeviceRouter')
+        apiResults = deviceAPI.callMethod('getDeviceUuidsByName', query=query)
         if apiResults.get('result', {}).get('success', False) is False:
             raise Exception('Device query failed')
         if apiResults['result']['data']:
             self.results = apiResults['result']['data']
         else:
-            self.log.error('Non-sucessful result returned: %s' % resp)
+            self.log.error('Non-successful result returned')
         self.count = len(self.results)
 
     def getFirstUuid(self):
@@ -48,7 +55,7 @@ class ZenDeviceUuidFinder():
         return self.getFirstUuid()
 
 
-class ZenDeviceUidFinder():
+class ZenDeviceUidFinder(object):
     '''
     This class returns the name and UID (path) of a device when
     provided a query

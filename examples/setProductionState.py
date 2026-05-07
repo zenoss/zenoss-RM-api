@@ -1,11 +1,11 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, print_function
 #####################################################
 # Copyright (C) Zenoss, Inc. 2024, all rights reserved.
 # Author: Team Pinecone
 # Contact: Bill Loss 'closs  @ zenoss.com'
 #####################################################
 
-from __future__ import print_function
 
 import sys
 import zenApiLib

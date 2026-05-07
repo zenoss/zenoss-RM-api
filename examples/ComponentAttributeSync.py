@@ -1,3 +1,4 @@
+from __future__ import absolute_import, print_function
 import argparse
 import json
 import logging
@@ -97,7 +98,7 @@ def _initIOObject(argValue, name):
     if 'file:' in argValue:
         filename = argValue.split(':')[1]
         if name == "Source":
-            log.warn('"-t" command parameter does not apply when source is a file')
+            log.warning('"-t" command parameter does not apply when source is a file')
             ioObject = json.load(open(filename, 'r'))
             count('Total objects in "{}" Source file'.format(filename), len(ioObject))
             if args['sourceStart'] or args['sourceEnd']:

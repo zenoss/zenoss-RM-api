@@ -1,10 +1,10 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to remove a   #
 # device into Zenoss Resource Manager using the     #
 # Zenoss JSON API and the Zenoss RM API Library    #
 #####################################################
-from __future__ import print_function
 
 
 import sys

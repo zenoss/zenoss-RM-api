@@ -1,5 +1,5 @@
-#!/bin/python
-from __future__ import print_function
+#!/usr/bin/env python
+from __future__ import absolute_import, print_function
 import argparse
 import os
 import json
@@ -71,7 +71,7 @@ def updateHistoryFile(data, filePath = ""):
 def sendEvent(**evtFields):
     evtResp = evtRouter.callMethod('add_event', **evtFields)
     if not evtResp['result']['success']:
-        log.warn("sendEvent - nonSucessful results\n%s" % evtResp)
+        log.warning("sendEvent - nonSucessful results\n%s" % evtResp)
 
 
 if __name__ == '__main__':
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     )
     for apiResp in devInMaint:
         if not apiResp['result']['success']:
-            log.warn("Steag1 - nonSucessful results 'getDevices':\n%s" % apiResp)
+            log.warning("Steag1 - nonSucessful results 'getDevices':\n%s" % apiResp)
             sys.exit(1)
         else:
             for dev in apiResp['result']['devices']:

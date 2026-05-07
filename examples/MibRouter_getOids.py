@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, print_function
 #####################################################
 # This script is a basic example of how to create a #
 # list of mibs and display mib-related info   #
@@ -45,10 +46,9 @@ def mibReport():
     '''
     mib_resp = getMibs()
     mibs = mib_resp['data']
-    print 'oid, UID'
+    print('oid, UID')
     for mib in mibs:
-        print '%s, %s' % (mib['oid'],
-                               mib['uid'])
+        print('%s, %s' % (mib['oid'], mib['uid']))
 
 if __name__ == '__main__':
     mibReport()

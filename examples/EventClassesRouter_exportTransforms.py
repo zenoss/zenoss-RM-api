@@ -1,9 +1,9 @@
-#!/bin/env python
-from __future__ import print_function
+#!/usr/bin/env python
+from __future__ import absolute_import, print_function
 import zenApiLib
 import sys
 import os
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 from datetime import date
 
 
@@ -80,7 +80,7 @@ def write2File(sType, sUid, sData):
         oFile = open(sFilePath, 'w')
         oFile.write(sData)
         oFile.close()
-    except Exception, e:
+    except Exception as e:
         print("ERROR: %s" % (e))
         sys.exit(1)
 
@@ -114,4 +114,3 @@ if __name__ == '__main__':
     api.setRouter('EventClassesRouter')
     mappings('/zport/dmd/Events')
     eventClasses('/zport/dmd/Events')
-

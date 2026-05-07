@@ -1,10 +1,10 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, print_function
 #######################################################
 # This is a report that prints out OS Processes that have 
 # been modeled on or added to servers, along with their 
 # monitored state             
 #######################################################
-from __future__ import print_function
 import zenApiLib
 zenApi = zenApiLib.zenConnector()
 zenApi.setRouter('DeviceRouter')
