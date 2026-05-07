@@ -24,12 +24,11 @@ This repository is a fork of https://github.com/amccurdy/zenoss_api and currentl
 - 'zenApiCli.py' script available. For simple, command line API interaction. Can be easily incorporated with existing shell scripts.
 
 ## Pre-requisites:
-This python library depends on the following: Python 2.7, requests, pyOpenSSL, ndg-httpsclient, pyasn1
+This python library supports **Python 2.7 and Python 3.6+** and depends on the following packages: requests, pyOpenSSL, six
 
-You can install those quickly with pip:
+Install with pip:
 ```
-yum -y install python-pip
-pip install requests pyOpenSSL ndg-httpsclient pyasn1
+pip install requests pyOpenSSL six
 ```
 
 ## Environment:
@@ -90,56 +89,57 @@ _Note_: The credentials `creds.cfg` file by default is expected to be in the sam
    Once the **zenApiLib** library is imported you can then instantiate _zenConnector_ a few different ways:
 
    1. get all triggers
-      ```
+      ```python
       import zenApiLib
       zenApi = zenApiLib.zenConnector()
       zenApi.setRouter('TriggersRouter')
-      print zenApi.callMethod('getTriggers')
+      print(zenApi.callMethod('getTriggers'))
       ```
 
    1. get all devices
-      ```
+      ```python
       import zenApiLib
-      dr = zenApiLib.zenConnector(routerName = 'DeviceRouter')
-      print dr.callMethod('getDevices')
+      dr = zenApiLib.zenConnector(routerName='DeviceRouter')
+      print(dr.callMethod('getDevices'))
       ```
 
    1. copy trigger from one zenoss instance to another
-      ```
+      ```python
       import zenApiLib
-      tr5 = zenApiLib.zenConnector(section = '5x', routerName = 'TriggersRouter')
-      tr6 = zenApiLib.zenConnector(section = '6x', routerName = 'TriggersRouter')
-      migrate = tr5.callMethod('getTrigger', uuid = "e9ac462f-a80e-4f62-83e2-5f410818d782")
+      tr5 = zenApiLib.zenConnector(section='5x', routerName='TriggersRouter')
+      tr6 = zenApiLib.zenConnector(section='6x', routerName='TriggersRouter')
+      migrate = tr5.callMethod('getTrigger', uuid="e9ac462f-a80e-4f62-83e2-5f410818d782")
       # TODO: below is incorrect, but you get the general idea
-      tr6.callMethod('addTrigger' **dict(migrate['result'])
+      tr6.callMethod('addTrigger', **dict(migrate['result']))
       ```
 
    1. get all devices, via multiple queries. limits max number of results per query to two.
-      ```
+      ```python
       import zenApiLib
-      dr = zenApiLib.zenConnector(routerName = 'DeviceRouter')
-      for apiResp in dr.pagingMethodCall('getDevices', limit = 2, keys = ["productionState", "id"]):
-         print apiResp
+      dr = zenApiLib.zenConnector(routerName='DeviceRouter')
+      for apiResp in dr.pagingMethodCall('getDevices', limit=2, keys=["productionState", "id"]):
+          print(apiResp)
       ```
 
    1. send an event & check success
-      ```
+      ```python
       import zenApiLib
-      er = zenApiLib.zenConnector(routerName = 'EventsRouter')
-      evtResp = er.callMethod('add_event', 
-          summary = "Device in Maintenance too long !",
-          device ="localhost",
-          component = "",
-          severity = 2,
-          evclasskey = "",
-          evclass = "/Status/Zenoss"
+      er = zenApiLib.zenConnector(routerName='EventsRouter')
+      evtResp = er.callMethod('add_event',
+          summary="Device in Maintenance too long!",
+          device="localhost",
+          component="",
+          severity=2,
+          evclasskey="",
+          evclass="/Status/Zenoss"
       )
       if not evtResp['result']['success']:
-          print("sendEvent - nonSucessful results\n%s" % evtResp)
+          print("sendEvent - nonSuccessful results\n%s" % evtResp)
       ```
 
 ## API Router Helper Libraries:
-**Files**: zenApiDeviceRouterHelper.py, zenApiImpactRouterHelper.py
+**Files**: zenApiDeviceRouterHelper.py, zenApiImpactRouterHelper.py, zenApiJobsRouterHelper.py
 
-Helper libraries that are router specific, should contain common, repeatbly used functionality.
+Helper libraries that are router specific, should contain common, repeatedly used functionality.
 
+_Note_: `zenJobsRouterHelper.py` is retained as a backwards compatibility shim that re-exports from `zenApiJobsRouterHelper.py`. New code should import from `zenApiJobsRouterHelper` directly.

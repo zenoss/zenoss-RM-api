@@ -1,7 +1,8 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, print_function
 
 
-class RouterEndpointMap():
+class RouterEndpointMap(object):
     '''
     This class isn't incredibly pretty but it's basic. It's used to
     provide the path to the router you need. Feed it a name, get what
